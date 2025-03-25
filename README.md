@@ -1,2 +1,3 @@
 # SUAL
-모바일 프로그래밍 1조 - 안드로이드 스튜디오를 활용한 네이티브 앱 프로젝트 
+---
+![image](https://github.com/user-attachments/assets/bf25bb0e-6dad-4083-8ae1-a3f1a46f223d)
