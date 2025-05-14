@@ -1,120 +1,111 @@
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.select.Elements;
 import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
-import java.io.IOException;
+import java.io.*;
+import java.security.SecureRandom;
+import java.security.cert.X509Certificate;
 import java.util.HashSet;
 import java.util.Set;
+import javax.net.ssl.*;
 
 public class Main {
+    private static final String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36";
+    private static final String TARGET_URL = "https://www.syu.ac.kr/academic/academic-notice/";
+    private static final int CONNECTION_TIMEOUT = 10000;
+    private static final int CRAWL_DELAY = 1000;
+    private static final Set<String> savedUrls = new HashSet<>();
 
-    // 저장된 URL을 기억하는 Set (중복 저장 방지용)
-    private static Set<String> savedUrls = new HashSet<>();
-
-    /**
-     * 삼육대학교 공지사항 페이지에 접속하여 HTML을 가져오고,
-     * 공지사항의 링크를 추출하여 내용을 저장한다.
-     */
-    public void crawl() {
-        SSLBypass.disableSslVerification();
-        String url = "https://www.syu.ac.kr/academic/academic-notice/";
-
+    public static void main(String[] args) {
         try {
-            // 공지 목록 페이지 크롤링
-            Document doc = Jsoup.connect(url)
-                    .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
-                    .timeout(10000)
-                    .get();
-
-            // 공지 박스 내 링크들을 모두 가져옴
-            Elements links = doc.select("td.step2 a");
-
-            for (Element link : links) {
-                String contentUrl = link.absUrl("href");
-
-                // 중복 확인
-                if (isAlreadySaved(contentUrl)) {
-                    System.out.println("이미 저장된 공지입니다: " + contentUrl);
-                    continue;
-                }
-
-                try {
-                    // 상세 공지 페이지 크롤링
-                    Document contentDoc = Jsoup.connect(contentUrl)
-                            .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
-                            .timeout(10000)
-                            .get();
-                    String contentHtml = contentDoc.html();
-
-                    // 저장
-                    save(contentUrl, contentHtml);
-
-                    // 과도한 요청 방지를 위한 잠시 대기
-                    Thread.sleep(1000); // 1초 대기
-
-                } catch (IOException e) {
-                    System.err.println("개별 URL 처리 중 오류 발생: " + contentUrl);
-                    e.printStackTrace();
-                } catch (InterruptedException e) {
-                    System.err.println("대기 중 인터럽트 발생");
-                    Thread.currentThread().interrupt();
-                    break;
-                }
-            }
-
-        } catch (IOException e) {
-            System.err.println("메인 페이지 크롤링 중 오류 발생: " + e.getMessage());
+            disableSslVerification();
+            crawl();
+        } catch (Exception e) {
+            System.err.println("프로그램 실행 중 오류 발생: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
-    /**
-     * 저장 여부 확인 함수
-     */
-    private boolean isAlreadySaved(String url) {
-        return savedUrls.contains(url);
-    }
+    private static void crawl() throws IOException, InterruptedException {
+        Document doc = Jsoup.connect(TARGET_URL)
+                .userAgent(USER_AGENT)
+                .timeout(CONNECTION_TIMEOUT)
+                .get();
 
-    /**
-     * 공지사항 본문 내용을 저장하는 함수
-     */
-    private void save(String url, String html) {
-        savedUrls.add(url); // 저장한 URL 기록
-        System.out.println("공지사항 저장됨: " + url);
-        // 저장 로직 구현 필요 (예: DB insert, 파일 저장 등)
-    }
+        Elements links = doc.select("td.step2 a");
+        System.out.println("발견된 공지사항 수: " + links.size());
 
-    /**
-     * 프로그램 진입점: 일정 주기로 crawl() 실행
-     */
-    public static void main(String[] args) {
-        Main m = new Main();
-
-        while (true) {
-            try {
-                m.crawl(); // 크롤링 수행
-
-                // 1시간 대기 (3600000 ms)
-                System.out.println("다음 크롤링까지 1시간 대기...");
-                Thread.sleep(60 * 60 * 1000);
-
-            } catch (InterruptedException e) {
-                System.err.println("메인 스레드 인터럽트 발생");
-                Thread.currentThread().interrupt();
-                break;
-            } catch (Exception e) {
-                System.err.println("예상치 못한 오류 발생: " + e.getMessage());
-                e.printStackTrace();
-                // 오류 발생 시 5분 대기 후 재시도
-                try {
-                    System.out.println("5분 후 재시도...");
-                    Thread.sleep(5 * 60 * 1000);
-                } catch (InterruptedException ie) {
-                    Thread.currentThread().interrupt();
-                    break;
-                }
+        for (Element link : links) {
+            String contentUrl = link.absUrl("href");
+            
+            if (savedUrls.contains(contentUrl)) {
+                System.out.println("이미 저장된 공지입니다: " + contentUrl);
+                continue;
             }
+
+            try {
+                Document contentDoc = Jsoup.connect(contentUrl)
+                        .userAgent(USER_AGENT)
+                        .timeout(CONNECTION_TIMEOUT)
+                        .get();
+
+                // 공지사항 제목
+                String title = contentDoc.select("h3.title").text();
+                // 공지사항 내용
+                String content = contentDoc.select("div.content-body").html();
+                // 공지사항 날짜
+                String date = contentDoc.select("span.date").text();
+
+                save(contentUrl, String.format(
+                    "제목: %s\n날짜: %s\n내용:\n%s", 
+                    title, date, content
+                ));
+
+                savedUrls.add(contentUrl);
+                System.out.println("저장 완료: " + title);
+                
+                Thread.sleep(CRAWL_DELAY);
+            } catch (IOException e) {
+                System.err.println("개별 URL 처리 중 오류 발생: " + contentUrl);
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private static void save(String url, String content) {
+        String fileName = "notice_" + System.currentTimeMillis() + ".txt";
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
+            writer.write("URL: " + url + "\n\n");
+            writer.write(content);
+            System.out.println("파일 저장 완료: " + fileName);
+        } catch (IOException e) {
+            System.err.println("파일 저장 중 오류 발생: " + fileName);
+            e.printStackTrace();
+        }
+    }
+
+    private static void disableSslVerification() {
+        try {
+            TrustManager[] trustAllCerts = new TrustManager[]{
+                new X509TrustManager() {
+                    public X509Certificate[] getAcceptedIssuers() {
+                        return null;
+                    }
+                    public void checkClientTrusted(X509Certificate[] certs, String authType) {}
+                    public void checkServerTrusted(X509Certificate[] certs, String authType) {}
+                }
+            };
+
+            SSLContext sc = SSLContext.getInstance("SSL");
+            sc.init(null, trustAllCerts, new SecureRandom());
+            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+            
+            HostnameVerifier allHostsValid = (hostname, session) -> true;
+            HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
+        } catch (Exception e) {
+            System.err.println("SSL 검증 비활성화 중 오류 발생");
+            e.printStackTrace();
         }
     }
 }
