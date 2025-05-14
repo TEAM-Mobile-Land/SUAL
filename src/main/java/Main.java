@@ -17,14 +17,16 @@ public class Main {
      * 공지사항의 링크를 추출하여 내용을 저장한다.
      */
     public void crawl() {
-
         SSLBypass.disableSslVerification();
-
         String url = "https://www.syu.ac.kr/academic/academic-notice/";
 
         try {
             // 공지 목록 페이지 크롤링
-            Document doc = Jsoup.connect(url).get();
+            Document doc = Jsoup.connect(url)
+                    .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
+                    .timeout(10000)
+                    .get();
+
             // 공지 박스 내 링크들을 모두 가져옴
             Elements links = doc.select("td.step2 a");
 
@@ -37,16 +39,33 @@ public class Main {
                     continue;
                 }
 
-                // 상세 공지 페이지 크롤링
-                Document contentDoc = Jsoup.connect(contentUrl).get();
-                String contentHtml = contentDoc.html();
+                try {
+                    // 상세 공지 페이지 크롤링
+                    Document contentDoc = Jsoup.connect(contentUrl)
+                            .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
+                            .timeout(10000)
+                            .get();
+                    String contentHtml = contentDoc.html();
 
-                // 저장
-                save(contentUrl, contentHtml);
+                    // 저장
+                    save(contentUrl, contentHtml);
+
+                    // 과도한 요청 방지를 위한 잠시 대기
+                    Thread.sleep(1000); // 1초 대기
+
+                } catch (IOException e) {
+                    System.err.println("개별 URL 처리 중 오류 발생: " + contentUrl);
+                    e.printStackTrace();
+                } catch (InterruptedException e) {
+                    System.err.println("대기 중 인터럽트 발생");
+                    Thread.currentThread().interrupt();
+                    break;
+                }
             }
 
         } catch (IOException e) {
-            System.err.println("크롤링 중 오류 발생: " + e.getMessage());
+            System.err.println("메인 페이지 크롤링 중 오류 발생: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -73,16 +92,29 @@ public class Main {
         Main m = new Main();
 
         while (true) {
-            m.crawl(); // 크롤링 수행
-
             try {
+                m.crawl(); // 크롤링 수행
+
                 // 1시간 대기 (3600000 ms)
+                System.out.println("다음 크롤링까지 1시간 대기...");
                 Thread.sleep(60 * 60 * 1000);
+
             } catch (InterruptedException e) {
+                System.err.println("메인 스레드 인터럽트 발생");
                 Thread.currentThread().interrupt();
                 break;
+            } catch (Exception e) {
+                System.err.println("예상치 못한 오류 발생: " + e.getMessage());
+                e.printStackTrace();
+                // 오류 발생 시 5분 대기 후 재시도
+                try {
+                    System.out.println("5분 후 재시도...");
+                    Thread.sleep(5 * 60 * 1000);
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                    break;
+                }
             }
         }
     }
 }
-
