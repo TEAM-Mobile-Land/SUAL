@@ -1,0 +1,28 @@
+# === 전역 설정 ===
+
+# IDE
+.idea/
+*.iml
+
+# 빌드 디렉토리
+build/
+.gradle/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Android local config
+local.properties
+
+# === Client 전용 ===
+Client/.idea/
+Client/.gradle/
+Client/build/
+Client/local.properties
+
+# === Server 전용 ===
+Server/.idea/
+Server/.gradle/
+Server/build/
+Server/local.properties
