@@ -21,6 +21,10 @@
         android:layout_gravity="bottom"
         app:labelVisibilityMode="labeled"
         app:itemIconTint="@null"
-        android:background="?android:attr/windowBackground"
+        app:itemBackground="@null"
+        android:background="@color/white"
+        app:itemHorizontalTranslationEnabled="false"
+        app:itemActiveIndicatorStyle="@style/NoIndicator"
+        app:itemRippleColor="@android:color/transparent"
         app:menu="@menu/bottom_nav_menu" />
 </LinearLayout>
