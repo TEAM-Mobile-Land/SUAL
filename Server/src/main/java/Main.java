@@ -239,3 +239,5 @@ class NoticeDto {
     public Map<String, Object> getParsedContent() { return parsedContent; }
     public void setParsedContent(Map<String, Object> parsedContent) { this.parsedContent = parsedContent; }
 }
+
+// 테스트용
