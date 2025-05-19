@@ -123,9 +123,9 @@ public class Main {
                 .get();
 
         NoticeDto notice = new NoticeDto();
-        notice.setTitle(contentDoc.select("h3.title").text());
-        notice.setContent(contentDoc.select("div.content-body").html());
-        notice.setDate(contentDoc.select("span.date").text());
+        notice.setTitle(contentDoc.select(".md_m_tit").text());
+        notice.setContent(contentDoc.select(".single_cont").text());
+        notice.setDate(contentDoc.select(".meta_item").first().text());
         notice.setUrl(contentUrl);
 
         Element contentBody = contentDoc.select("div.content-body").first();
