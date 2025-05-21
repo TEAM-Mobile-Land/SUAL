@@ -12,6 +12,9 @@ repositories {
 dependencies {
     implementation("com.google.code.gson:gson:2.10.1")
     implementation("org.jsoup:jsoup:1.17.2")
+
+    // Google AI SDK
+    implementation("com.google.cloud:google-cloud-aiplatform:3.63.0")
 }
 
 java {
