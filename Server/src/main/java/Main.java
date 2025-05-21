@@ -38,27 +38,18 @@ public class Main {
     }
 
     private static void disableSslVerification() throws Exception {
-        // SSL 검증을 비활성화하는 TrustManager 생성
         TrustManager[] trustAllCerts = new TrustManager[]{
                 new X509TrustManager() {
-                    public X509Certificate[] getAcceptedIssuers() {
-                        return null;
-                    }
-                    public void checkClientTrusted(X509Certificate[] certs, String authType) {
-                    }
-                    public void checkServerTrusted(X509Certificate[] certs, String authType) {
-                    }
+                    public X509Certificate[] getAcceptedIssuers() { return null; }
+                    public void checkClientTrusted(X509Certificate[] certs, String authType) {}
+                    public void checkServerTrusted(X509Certificate[] certs, String authType) {}
                 }
         };
 
-        // SSL 컨텍스트 설정
         SSLContext sc = SSLContext.getInstance("SSL");
         sc.init(null, trustAllCerts, new SecureRandom());
         HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-
-        // 호스트네임 검증 비활성화
-        HostnameVerifier allHostsValid = (hostname, session) -> true;
-        HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
+        HttpsURLConnection.setDefaultHostnameVerifier((hostname, session) -> true);
     }
 
     private static void crawl() throws IOException, InterruptedException {
@@ -76,7 +67,6 @@ public class Main {
 
         for (Element link : links) {
             String contentUrl = link.absUrl("href");
-
             if (savedUrls.contains(contentUrl)) {
                 System.out.println("이미 저장된 공지입니다: " + contentUrl);
                 continue;
@@ -86,9 +76,7 @@ public class Main {
                 NoticeDto notice = crawlNotice(link);
                 notices.add(notice);
                 savedUrls.add(contentUrl);
-
                 saveNoticeAsJson(notice);
-
                 Thread.sleep(CRAWL_DELAY);
             } catch (IOException e) {
                 System.err.println("개별 URL 처리 중 오류 발생: " + contentUrl);
@@ -123,10 +111,34 @@ public class Main {
                 .get();
 
         NoticeDto notice = new NoticeDto();
-        notice.setTitle(contentDoc.select(".md_m_tit").text());
-        notice.setContent(contentDoc.select(".single_cont").text());
+        String title = contentDoc.select(".md_m_tit").text();
+        String content = contentDoc.select(".single_cont").text();
+        notice.setTitle(title);
+        notice.setContent(content);
         notice.setDate(contentDoc.select(".meta_item").first().text());
         notice.setUrl(contentUrl);
+
+        String prompt = String.format(
+                """
+                다음 공지사항을 대학생들이 빠르게 이해할 수 있도록 요약해주세요.
+                
+                규칙:
+                1. 반드시 알아야 할 중요 날짜나 기한이 있다면 ⏰ 이모지와 함께 먼저 표시
+                2. 핵심 내용을 3-4줄로 요약
+                3. 필요한 준비물이나 서류가 있다면 📝 이모지와 함께 목록 표시
+                4. 친근하고 명확한 언어 사용
+                5. 전문용어가 있다면 쉬운 말로 풀어서 설명
+                
+                제목: %s
+                
+                내용: %s
+                """,
+                title,
+                content
+        );
+
+        String summary = GeminiService.generateSummary(prompt);
+        notice.setAiSummary(summary);
 
         Element contentBody = contentDoc.select("div.content-body").first();
         Map<String, Object> parsedContent = parseHtmlContent(contentBody);
@@ -142,14 +154,11 @@ public class Main {
             if (!tables.isEmpty()) {
                 result.put("tables", parseTablesContent(tables));
             }
-
             result.put("textContent", content.text());
-
             Elements links = content.select("a");
             if (!links.isEmpty()) {
                 result.put("links", parseLinks(links));
             }
-
             Elements images = content.select("img");
             if (!images.isEmpty()) {
                 result.put("images", parseImages(images));
@@ -196,7 +205,6 @@ public class Main {
     private static void saveNoticeAsJson(NoticeDto notice) {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         String fileName = String.format("%s/notice_%d.json", JSON_DIRECTORY, System.currentTimeMillis());
-
         try (FileWriter writer = new FileWriter(fileName)) {
             gson.toJson(notice, writer);
             System.out.println("JSON 파일 저장 완료: " + fileName);
@@ -209,7 +217,6 @@ public class Main {
     private static void saveNoticesListAsJson(List<NoticeDto> notices) {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         String fileName = String.format("%s/notices_list_%d.json", JSON_DIRECTORY, System.currentTimeMillis());
-
         try (FileWriter writer = new FileWriter(fileName)) {
             gson.toJson(notices, writer);
             System.out.println("전체 목록 JSON 파일 저장 완료: " + fileName);
@@ -225,9 +232,9 @@ class NoticeDto {
     private String content;
     private String date;
     private String url;
+    private String aiSummary;
     private Map<String, Object> parsedContent;
 
-    // Getters and Setters
     public String getTitle() { return title; }
     public void setTitle(String title) { this.title = title; }
     public String getContent() { return content; }
@@ -238,6 +245,6 @@ class NoticeDto {
     public void setUrl(String url) { this.url = url; }
     public Map<String, Object> getParsedContent() { return parsedContent; }
     public void setParsedContent(Map<String, Object> parsedContent) { this.parsedContent = parsedContent; }
+    public String getAiSummary() { return aiSummary; }
+    public void setAiSummary(String aiSummary) { this.aiSummary = aiSummary; }
 }
-
-// 테스트용

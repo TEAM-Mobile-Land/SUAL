@@ -62,4 +62,4 @@ build/
 .Trashes
 ehthumbs.db
 Thumbs.db
-config.properties
+config.properties.template
