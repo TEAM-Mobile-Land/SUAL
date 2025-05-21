@@ -85,9 +85,16 @@ public class Main {
         }
         // ======= 테스트용 코드 끝 =======
 
-        // 기존 전체 처리 코드 (테스트를 위해 주석처리)
+        // 기존 전체 처리 코드 수정 (최근 5개만 처리)
     /*
+    int processedCount = 0;
+    int maxNotices = 5; // 처리할 최대 공지사항 수
+
     for (Element link : links) {
+        if (processedCount >= maxNotices) {
+            break; // 최대 개수에 도달하면 반복문 종료
+        }
+
         String contentUrl = link.absUrl("href");
         if (savedUrls.contains(contentUrl)) {
             System.out.println("이미 저장된 공지입니다: " + contentUrl);
@@ -100,6 +107,7 @@ public class Main {
             savedUrls.add(contentUrl);
             saveNoticeAsJson(notice);
             Thread.sleep(CRAWL_DELAY);
+            processedCount++; // 처리된 공지사항 수 증가
         } catch (IOException e) {
             System.err.println("개별 URL 처리 중 오류 발생: " + contentUrl);
             e.printStackTrace();
