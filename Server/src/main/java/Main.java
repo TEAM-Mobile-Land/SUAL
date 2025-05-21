@@ -65,28 +65,50 @@ public class Main {
 
         List<NoticeDto> notices = new ArrayList<>();
 
-        for (Element link : links) {
-            String contentUrl = link.absUrl("href");
-            if (savedUrls.contains(contentUrl)) {
-                System.out.println("이미 저장된 공지입니다: " + contentUrl);
-                continue;
-            }
-
+        // ======= 테스트용 코드 시작 =======
+        if (!links.isEmpty()) {
+            Element firstLink = links.first();
             try {
-                NoticeDto notice = crawlNotice(link);
+                NoticeDto notice = crawlNotice(firstLink);
                 notices.add(notice);
-                savedUrls.add(contentUrl);
                 saveNoticeAsJson(notice);
-                Thread.sleep(CRAWL_DELAY);
+                System.out.println("\n=== 테스트용 첫 번째 공지사항 처리 결과 ===");
+                System.out.println("제목: " + notice.getTitle());
+                System.out.println("날짜: " + notice.getDate());
+                System.out.println("AI 요약:\n" + notice.getAiSummary());
+                System.out.println("=====================================\n");
+                return; // 첫 번째 공지사항만 처리하고 종료
             } catch (IOException e) {
-                System.err.println("개별 URL 처리 중 오류 발생: " + contentUrl);
+                System.err.println("테스트 공지사항 처리 중 오류 발생");
                 e.printStackTrace();
             }
         }
+        // ======= 테스트용 코드 끝 =======
 
-        saveNoticesListAsJson(notices);
+        // 기존 전체 처리 코드 (테스트를 위해 주석처리)
+    /*
+    for (Element link : links) {
+        String contentUrl = link.absUrl("href");
+        if (savedUrls.contains(contentUrl)) {
+            System.out.println("이미 저장된 공지입니다: " + contentUrl);
+            continue;
+        }
+
+        try {
+            NoticeDto notice = crawlNotice(link);
+            notices.add(notice);
+            savedUrls.add(contentUrl);
+            saveNoticeAsJson(notice);
+            Thread.sleep(CRAWL_DELAY);
+        } catch (IOException e) {
+            System.err.println("개별 URL 처리 중 오류 발생: " + contentUrl);
+            e.printStackTrace();
+        }
     }
 
+    saveNoticesListAsJson(notices);
+    */
+    }
     private static SSLSocketFactory createSSLSocketFactory() {
         try {
             SSLContext sslContext = SSLContext.getInstance("TLS");
