@@ -21,15 +21,12 @@ import kotlin.jvm.functions.Function2;
 
 
 public class LoginActivity extends AppCompatActivity {
-
-    private Button kakaoLoginBtn;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        kakaoLoginBtn = findViewById(R.id.kakao_login_button);
+        Button kakaoLoginBtn = findViewById(R.id.kakao_login_button);
 
         kakaoLoginBtn.setOnClickListener(v -> {
             if (UserApiClient.getInstance().isKakaoTalkLoginAvailable(this)) {
@@ -65,6 +62,11 @@ public class LoginActivity extends AppCompatActivity {
                 if (meError != null) {
                     Log.e("KakaoLogin", "사용자 정보 요청 실패", meError);
                 } else if (user != null) {
+
+                    // ✅ 고유 ID 받아오기
+                    Long kakaoId = user.getId();
+                    Log.i("KakaoLogin", "카카오 ID: " + kakaoId);
+
                     if (user.getKakaoAccount() != null && user.getKakaoAccount().getProfile() != null) {
                         String nickname = user.getKakaoAccount().getProfile().getNickname();
                         Log.i("KakaoLogin", "닉네임: " + nickname);
@@ -80,7 +82,6 @@ public class LoginActivity extends AppCompatActivity {
                 }
                 return null;
             });
-
         }
         return null;
     };
