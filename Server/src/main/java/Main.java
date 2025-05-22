@@ -83,7 +83,8 @@ public class Main {
                 e.printStackTrace();
             }
         }
-        // ======= 테스트용 코드 끝 =======
+        //======= 테스트용 코드 끝 =======
+        //
 
         // 기존 전체 처리 코드 수정 (최근 5개만 처리)
         /*
@@ -114,7 +115,7 @@ public class Main {
             }
         }
 
-        saveNoticesListAsJson(notices);
+        //saveNoticesListAsJson(notices);
         */
     }
 
