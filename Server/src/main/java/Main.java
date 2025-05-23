@@ -22,6 +22,7 @@ public class Main {
     private static final String JSON_DIRECTORY = "crawled_json";
     private static final String TITLES_FILE = "crawled_json/processed_titles.json";
     private static Set<String> processedTitles = new HashSet<>();
+    private static final int maxNotices = 5; // 크롤링할 공지사항 수를 여기서 조절
 
     public static void main(String[] args) {
         try {
@@ -99,7 +100,6 @@ public class Main {
 
         loadProcessedTitles();
 
-        int maxNotices = 5;
         int processedCount = 0;
         int newNoticesCount = 0;
 
@@ -122,7 +122,7 @@ public class Main {
                     NoticeDto notice = crawlNotice(link);
                     notices.add(notice);
                     processedTitles.add(title);
-                    saveNoticeAsJson(notice);
+                    saveNoticeAsJson(notice, processedCount);
                     newNoticesCount++;
                     Thread.sleep(CRAWL_DELAY);
                 } catch (IOException e) {
@@ -252,9 +252,12 @@ public class Main {
         return tableData;
     }
 
-    private static void saveNoticeAsJson(NoticeDto notice) {
+    private static void saveNoticeAsJson(NoticeDto notice, int index) {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        String fileName = String.format("%s/notice_%d.json", JSON_DIRECTORY, System.currentTimeMillis());
+        // 최신글이 더 큰 타임스탬프를 갖도록 처리
+        long timestamp = System.currentTimeMillis() + (maxNotices - index);
+        String fileName = String.format("%s/notice_%d.json", JSON_DIRECTORY, timestamp);
+
         try (FileWriter writer = new FileWriter(fileName)) {
             gson.toJson(notice, writer);
             System.out.println("JSON 파일 저장 완료: " + fileName);
