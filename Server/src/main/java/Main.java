@@ -1,5 +1,6 @@
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -7,6 +8,7 @@ import org.jsoup.select.Elements;
 
 import javax.net.ssl.*;
 import java.io.*;
+import java.lang.reflect.Type;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 import java.util.*;
@@ -18,6 +20,8 @@ public class Main {
     private static final int CRAWL_DELAY = 1000;
     private static final Set<String> savedUrls = new HashSet<>();
     private static final String JSON_DIRECTORY = "crawled_json";
+    private static final String TITLES_FILE = "crawled_json/processed_titles.json";
+    private static Set<String> processedTitles = new HashSet<>();
 
     public static void main(String[] args) {
         try {
@@ -34,6 +38,34 @@ public class Main {
         File directory = new File(JSON_DIRECTORY);
         if (!directory.exists()) {
             directory.mkdir();
+        }
+    }
+
+    private static void loadProcessedTitles() {
+        File file = new File(TITLES_FILE);
+        if (file.exists()) {
+            try (FileReader reader = new FileReader(file)) {
+                Gson gson = new Gson();
+                Type setType = new TypeToken<HashSet<String>>(){}.getType();
+                processedTitles = gson.fromJson(reader, setType);
+                if (processedTitles == null) {
+                    processedTitles = new HashSet<>();
+                }
+            } catch (IOException e) {
+                System.err.println("제목 목록 로드 중 오류 발생: " + e.getMessage());
+                processedTitles = new HashSet<>();
+            }
+        } else {
+            processedTitles = new HashSet<>();
+        }
+    }
+
+    private static void saveProcessedTitles() {
+        try (FileWriter writer = new FileWriter(TITLES_FILE)) {
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            gson.toJson(processedTitles, writer);
+        } catch (IOException e) {
+            System.err.println("제목 목록 저장 중 오류 발생: " + e.getMessage());
         }
     }
 
@@ -65,58 +97,44 @@ public class Main {
 
         List<NoticeDto> notices = new ArrayList<>();
 
-        // ======= 테스트용 코드 시작 =======
-        if (!links.isEmpty()) {
-            Element firstLink = links.first();
-            try {
-                NoticeDto notice = crawlNotice(firstLink);
-                notices.add(notice);
-                saveNoticeAsJson(notice);
-                System.out.println("\n=== 테스트용 첫 번째 공지사항 처리 결과 ===");
-                System.out.println("제목: " + notice.getTitle());
-                System.out.println("날짜: " + notice.getDate());
-                System.out.println("AI 요약:\n" + notice.getAiSummary());
-                System.out.println("=====================================\n");
-                return; // 첫 번째 공지사항만 처리하고 종료
-            } catch (IOException e) {
-                System.err.println("테스트 공지사항 처리 중 오류 발생");
-                e.printStackTrace();
-            }
-        }
-        //======= 테스트용 코드 끝 =======
-        //
+        loadProcessedTitles();
 
-        // 기존 전체 처리 코드 수정 (최근 5개만 처리)
-        /*
+        int maxNotices = 5;
         int processedCount = 0;
-        int maxNotices = 5; // 처리할 최대 공지사항 수
+        int newNoticesCount = 0;
 
         for (Element link : links) {
-            if (processedCount >= maxNotices) {
-                break; // 최대 개수에 도달하면 반복문 종료
-            }
-
             String contentUrl = link.absUrl("href");
-            if (savedUrls.contains(contentUrl)) {
-                System.out.println("이미 저장된 공지입니다: " + contentUrl);
-                continue;
+            Document contentDoc = Jsoup.connect(contentUrl)
+                    .userAgent(USER_AGENT)
+                    .timeout(CONNECTION_TIMEOUT)
+                    .get();
+            String title = contentDoc.select(".md_m_tit").text();
+
+            if (processedCount >= maxNotices) {
+                break;
             }
 
-            try {
-                NoticeDto notice = crawlNotice(link);
-                notices.add(notice);
-                savedUrls.add(contentUrl);
-                saveNoticeAsJson(notice);
-                Thread.sleep(CRAWL_DELAY);
-                processedCount++; // 처리된 공지사항 수 증가
-            } catch (IOException e) {
-                System.err.println("개별 URL 처리 중 오류 발생: " + contentUrl);
-                e.printStackTrace();
+            if (processedTitles.contains(title)) {
+                System.out.println("이미 처리된 공지입니다: " + title);
+            } else {
+                try {
+                    NoticeDto notice = crawlNotice(link);
+                    notices.add(notice);
+                    processedTitles.add(title);
+                    saveNoticeAsJson(notice);
+                    newNoticesCount++;
+                    Thread.sleep(CRAWL_DELAY);
+                } catch (IOException e) {
+                    System.err.println("개별 URL 처리 중 오류 발생: " + contentUrl);
+                    e.printStackTrace();
+                }
             }
+            processedCount++;
         }
 
-        //saveNoticesListAsJson(notices);
-        */
+        saveProcessedTitles();
+        System.out.println("새로 처리된 공지사항 수: " + newNoticesCount);
     }
 
     private static SSLSocketFactory createSSLSocketFactory() {
@@ -242,18 +260,6 @@ public class Main {
             System.out.println("JSON 파일 저장 완료: " + fileName);
         } catch (IOException e) {
             System.err.println("JSON 파일 저장 중 오류 발생: " + fileName);
-            e.printStackTrace();
-        }
-    }
-
-    private static void saveNoticesListAsJson(List<NoticeDto> notices) {
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        String fileName = String.format("%s/notices_list_%d.json", JSON_DIRECTORY, System.currentTimeMillis());
-        try (FileWriter writer = new FileWriter(fileName)) {
-            gson.toJson(notices, writer);
-            System.out.println("전체 목록 JSON 파일 저장 완료: " + fileName);
-        } catch (IOException e) {
-            System.err.println("전체 목록 JSON 파일 저장 중 오류 발생: " + fileName);
             e.printStackTrace();
         }
     }
