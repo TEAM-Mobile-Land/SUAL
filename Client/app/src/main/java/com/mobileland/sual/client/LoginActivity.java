@@ -46,35 +46,22 @@ public class LoginActivity extends AppCompatActivity {
                     Log.i("KakaoLogin", "카카오 ID: " + kakaoId);
 
                     Account kakaoAccount = user.getKakaoAccount();
-                    if (kakaoAccount != null) {
-                        Profile profile = kakaoAccount.getProfile();
-                        if (profile != null) {
-                            String nickname = profile.getNickname();
-                            Log.i("KakaoLogin", "닉네임: " + nickname);
-                        } else {
-                            Log.w("KakaoLogin", "프로필 정보 없음");
-                        }
-
-                        String email = kakaoAccount.getEmail();
-                        if (email != null) {
-                            Log.i("KakaoLogin", "이메일: " + email);
-                        } else {
-                            Log.w("KakaoLogin", "이메일 정보 없음 또는 동의하지 않음");
-                        }
+                    if (kakaoAccount != null && kakaoAccount.getProfile() != null) {
+                        String nickname = kakaoAccount.getProfile().getNickname();
+                        Log.i("KakaoLogin", "닉네임: " + nickname);
                     } else {
-                        Log.w("KakaoLogin", "KakaoAccount 정보 없음");
+                        Log.w("KakaoLogin", "닉네임 정보를 가져올 수 없습니다.");
                     }
 
-
+                    // 홈 화면으로 이동
                     Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
                     startActivity(intent);
                     finish();
                 } else {
-                    Log.w("KakaoLogin", "사용자 정보가 null입니다.");
+                    Log.w("KakaoLogin", "user 객체가 null입니다.");
                 }
                 return null;
             });
-
         }
         return null;
     };
