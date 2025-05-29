@@ -1,11 +1,7 @@
 package com.mobileland.sual.client;
 
 import android.content.Intent;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.Signature;
 import android.os.Bundle;
-import android.util.Base64;
 import android.util.Log;
 import android.widget.Button;
 
@@ -14,11 +10,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.kakao.sdk.auth.model.OAuthToken;
 import com.kakao.sdk.user.UserApiClient;
 
-import java.security.MessageDigest;
-
 import kotlin.Unit;
 import kotlin.jvm.functions.Function2;
-
 
 public class LoginActivity extends AppCompatActivity {
     @Override
@@ -35,21 +28,6 @@ public class LoginActivity extends AppCompatActivity {
                 UserApiClient.getInstance().loginWithKakaoAccount(this, callback);
             }
         });
-        try {
-            PackageInfo info = getPackageManager().getPackageInfo(
-                    getPackageName(),
-                    PackageManager.GET_SIGNATURES
-            );
-            for (Signature signature : info.signatures) {
-                MessageDigest md = MessageDigest.getInstance("SHA");
-                md.update(signature.toByteArray());
-                String keyHash = Base64.encodeToString(md.digest(), Base64.NO_WRAP);
-                Log.d("KeyHash", "🔥 실제 사용 중인 키 해시: " + keyHash);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
     }
 
     final Function2<OAuthToken, Throwable, Unit> callback = (token, error) -> {
@@ -62,8 +40,6 @@ public class LoginActivity extends AppCompatActivity {
                 if (meError != null) {
                     Log.e("KakaoLogin", "사용자 정보 요청 실패", meError);
                 } else if (user != null) {
-
-                    // ✅ 고유 ID 받아오기
                     Long kakaoId = user.getId();
                     Log.i("KakaoLogin", "카카오 ID: " + kakaoId);
 
