@@ -1,8 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="NoIndicator">
-        <item name="android:height">0dp</item>
-        <item name="android:width">0dp</item>
-        <item name="android:color">@android:color/transparent</item>
-    </style>
+    <!-- Theme.SUAL_Client 정의 삭제 -->
 </resources>
