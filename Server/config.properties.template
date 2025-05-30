@@ -1,4 +1,4 @@
 # Google Cloud API 설정
 # API 사용을 활성화하려면 주석을 제거하세요
-#gemini.api.key=AIzaSyCMRmHAIPyuVnimkG1aHkLi3VMDWJgRGPk
+gemini.api.key=AIzaSyCMRmHAIPyuVnimkG1aHkLi3VMDWJgRGPk
 PROJECT_ID=319810799066
