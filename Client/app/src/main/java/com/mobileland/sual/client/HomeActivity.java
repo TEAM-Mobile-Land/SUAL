@@ -1,13 +1,19 @@
 package com.mobileland.sual.client;
 
+import static android.app.PendingIntent.getActivity;
+
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.button.MaterialButton;
 
 public class HomeActivity extends AppCompatActivity {
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -15,7 +21,6 @@ public class HomeActivity extends AppCompatActivity {
 
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
         bottomNav.setOnItemSelectedListener(item -> {
-
             Fragment selectedFragment = null;
             int itemId = item.getItemId();
 
@@ -29,7 +34,6 @@ public class HomeActivity extends AppCompatActivity {
                 selectedFragment = new MyFragment();
             }
 
-
             getSupportFragmentManager()
                     .beginTransaction()
                     .replace(R.id.fragment_container, selectedFragment)
@@ -38,7 +42,6 @@ public class HomeActivity extends AppCompatActivity {
             return true;
         });
 
-        // 기본 프래그먼트 설정
         if (savedInstanceState == null) {
             bottomNav.setSelectedItemId(R.id.menu_home);
         }
