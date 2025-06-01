@@ -15,13 +15,27 @@ public class HomeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
+        MaterialButton scholarBtn = view.findViewById(R.id.scholarshipButton);
+        MaterialButton eventBtn = view.findViewById(R.id.eventNoticeButton);
+        MaterialButton academicBtn = view.findViewById(R.id.academicNoticeButton);
 
-        MaterialButton scholarshipButton = view.findViewById(R.id.scholarshipButton);
-
-        scholarshipButton.setOnClickListener(v -> {
+        scholarBtn.setOnClickListener(v -> {
             Intent intent = new Intent(getActivity(), ScholarshipActivity.class);
             startActivity(intent);
         });
+
+        eventBtn.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), EventActivity.class);
+            startActivity(intent);
+        });
+
+        academicBtn.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), AcademicActivity.class);
+            startActivity(intent);
+        });
+
+
+
 
         return view;
     }

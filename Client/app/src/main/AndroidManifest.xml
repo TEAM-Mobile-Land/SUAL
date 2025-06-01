@@ -54,6 +54,14 @@
             android:name=".ScholarshipActivity"
             android:exported="true" />
 
+        <activity
+            android:name=".EventActivity"
+            android:exported="true" />
+
+        <activity
+            android:name=".AcademicActivity"
+            android:exported="true"/>
+
     </application>
 
 </manifest>
