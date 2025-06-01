@@ -1,4 +1,4 @@
-package com.mobileland.sual.client;
+package com.mobileland.sual.client.api;
 
 import com.mobileland.sual.client.Notice;
 

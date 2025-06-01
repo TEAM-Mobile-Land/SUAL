@@ -1,6 +1,6 @@
 package com.mobileland.sual.client;
 
-import com.mobileland.sual.client.api.ScholarshipApi;
+import com.mobileland.sual.client.api.AcademicApi;
 
 import java.util.List;
 
@@ -8,7 +8,7 @@ import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class ScholarshipActivity extends BaseNoticeActivity {
+public class AcademicActivity extends BaseNoticeActivity {
 
     @Override
     protected Call<List<Notice>> getNoticeCall() {
@@ -17,7 +17,7 @@ public class ScholarshipActivity extends BaseNoticeActivity {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
-        ScholarshipApi api = retrofit.create(ScholarshipApi.class);
-        return api.getScholarshipNotices();
+        AcademicApi api = retrofit.create(AcademicApi.class);
+        return api.getAcademicNotices();
     }
 }
