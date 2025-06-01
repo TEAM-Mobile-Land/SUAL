@@ -1,7 +1,9 @@
 package com.mobileland.sual.client;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -28,11 +30,20 @@ public abstract class BaseNoticeActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_scholarship); // 재사용 가능하면 이 레이아웃 그대로 사용
+        setContentView(R.layout.activity_scholarship);
 
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
+
+        // 닫기 버튼 클릭 시 홈으로 이동
+        ImageButton closeButton = findViewById(R.id.closeButton);
+        closeButton.setOnClickListener(v -> {
+            Intent intent = new Intent(this, HomeActivity.class); // 홈 액티비티 이름에 맞게 바꿔!
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            startActivity(intent);
+            finish();
+        });
 
         noticeRecyclerView = findViewById(R.id.noticeRecyclerView);
         noticeRecyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -81,6 +92,10 @@ public abstract class BaseNoticeActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
+            // 닫기 버튼을 눌렀을 때 홈 화면으로 이동하게 이동
+            Intent intent = new Intent(this, HomeActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            startActivity(intent);
             finish();
             return true;
         }
