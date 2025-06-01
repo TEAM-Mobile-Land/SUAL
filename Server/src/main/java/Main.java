@@ -15,56 +15,74 @@ import java.util.*;
 
 public class Main {
     private static final String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36";
-    private static final String TARGET_URL = "https://www.syu.ac.kr/academic/academic-notice/";
+    private static final String ACADEMIC_URL = "https://www.syu.ac.kr/academic/academic-notice/";
+    private static final String SCHOLARSHIP_URL = "https://www.syu.ac.kr/academic/scholarship-information/scholarship-notice/";
+    private static final String EVENT_URL = "https://www.syu.ac.kr/university-square/notice/event/";
     private static final int CONNECTION_TIMEOUT = 10000;
     private static final int CRAWL_DELAY = 1000;
     private static final Set<String> savedUrls = new HashSet<>();
-    private static final String JSON_DIRECTORY = "crawled_json";
-    private static final String TITLES_FILE = "crawled_json/processed_titles.json";
-    private static Set<String> processedTitles = new HashSet<>();
-    private static final int maxNotices = 5; // 크롤링할 공지사항 수를 여기서 조절
+
+    private static final String BASE_DIRECTORY = "crawled_json";
+    private static final String ACADEMIC_DIRECTORY = BASE_DIRECTORY + "/academic";
+    private static final String SCHOLARSHIP_DIRECTORY = BASE_DIRECTORY + "/scholarship";
+    private static final String EVENT_DIRECTORY = BASE_DIRECTORY + "/event";
+
+    private static Map<String, Set<String>> processedTitles = new HashMap<>();
+    private static final int maxNotices = 1;
 
     public static void main(String[] args) {
         try {
-            createDirectory();
+            createDirectories();
             disableSslVerification();
-            crawl();
+
+            // 학사공지 크롤링
+            crawl(ACADEMIC_URL, ACADEMIC_DIRECTORY, "academic");
+
+            // 장학공지 크롤링 (URL이 추가되면 활성화)
+            if (!SCHOLARSHIP_URL.isEmpty()) {
+                crawl(SCHOLARSHIP_URL, SCHOLARSHIP_DIRECTORY, "scholarship");
+            }
+
+            // 행사공지 크롤링 (URL이 추가되면 활성화)
+            if (!EVENT_URL.isEmpty()) {
+                crawl(EVENT_URL, EVENT_DIRECTORY, "event");
+            }
         } catch (Exception e) {
             System.err.println("프로그램 실행 중 오류 발생: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
-    private static void createDirectory() {
-        File directory = new File(JSON_DIRECTORY);
-        if (!directory.exists()) {
-            directory.mkdir();
-        }
+    private static void createDirectories() {
+        new File(ACADEMIC_DIRECTORY).mkdirs();
+        new File(SCHOLARSHIP_DIRECTORY).mkdirs();
+        new File(EVENT_DIRECTORY).mkdirs();
     }
 
-    private static void loadProcessedTitles() {
-        File file = new File(TITLES_FILE);
+    private static void loadProcessedTitles(String directory) {
+        File file = new File(directory + "/processed_titles.json");
         if (file.exists()) {
             try (FileReader reader = new FileReader(file)) {
                 Gson gson = new Gson();
                 Type setType = new TypeToken<HashSet<String>>(){}.getType();
-                processedTitles = gson.fromJson(reader, setType);
-                if (processedTitles == null) {
-                    processedTitles = new HashSet<>();
+                Set<String> titles = gson.fromJson(reader, setType);
+                if (titles == null) {
+                    titles = new HashSet<>();
                 }
+                processedTitles.put(directory, titles);
             } catch (IOException e) {
                 System.err.println("제목 목록 로드 중 오류 발생: " + e.getMessage());
-                processedTitles = new HashSet<>();
+                processedTitles.put(directory, new HashSet<>());
             }
         } else {
-            processedTitles = new HashSet<>();
+            processedTitles.put(directory, new HashSet<>());
         }
     }
 
-    private static void saveProcessedTitles() {
-        try (FileWriter writer = new FileWriter(TITLES_FILE)) {
+    private static void saveProcessedTitles(String directory) {
+        try (FileWriter writer = new FileWriter(directory + "/processed_titles.json")) {
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
-            gson.toJson(processedTitles, writer);
+            gson.toJson(processedTitles.get(directory), writer);
         } catch (IOException e) {
             System.err.println("제목 목록 저장 중 오류 발생: " + e.getMessage());
         }
@@ -85,8 +103,10 @@ public class Main {
         HttpsURLConnection.setDefaultHostnameVerifier((hostname, session) -> true);
     }
 
-    private static void crawl() throws IOException, InterruptedException {
-        Document doc = Jsoup.connect(TARGET_URL)
+    private static void crawl(String targetUrl, String directory, String noticeType) throws IOException, InterruptedException {
+        if (targetUrl.isEmpty()) return;
+
+        Document doc = Jsoup.connect(targetUrl)
                 .userAgent(USER_AGENT)
                 .timeout(CONNECTION_TIMEOUT)
                 .ignoreHttpErrors(true)
@@ -94,16 +114,17 @@ public class Main {
                 .get();
 
         Elements links = doc.select("td.step2 a");
-        System.out.println("발견된 공지사항 수: " + links.size());
+        System.out.println(noticeType + " 공지사항 발견된 수: " + links.size());
 
         List<NoticeDto> notices = new ArrayList<>();
-
-        loadProcessedTitles();
+        loadProcessedTitles(directory);
 
         int processedCount = 0;
         int newNoticesCount = 0;
 
         for (Element link : links) {
+            if (processedCount >= maxNotices) break;
+
             String contentUrl = link.absUrl("href");
             Document contentDoc = Jsoup.connect(contentUrl)
                     .userAgent(USER_AGENT)
@@ -111,18 +132,15 @@ public class Main {
                     .get();
             String title = contentDoc.select(".md_m_tit").text();
 
-            if (processedCount >= maxNotices) {
-                break;
-            }
-
-            if (processedTitles.contains(title)) {
+            Set<String> currentProcessedTitles = processedTitles.get(directory);
+            if (currentProcessedTitles.contains(title)) {
                 System.out.println("이미 처리된 공지입니다: " + title);
             } else {
                 try {
-                    NoticeDto notice = crawlNotice(link);
+                    NoticeDto notice = crawlNotice(link, noticeType);
                     notices.add(notice);
-                    processedTitles.add(title);
-                    saveNoticeAsJson(notice, processedCount);
+                    currentProcessedTitles.add(title);
+                    saveNoticeAsJson(notice, processedCount, directory);
                     newNoticesCount++;
                     Thread.sleep(CRAWL_DELAY);
                 } catch (IOException e) {
@@ -133,8 +151,8 @@ public class Main {
             processedCount++;
         }
 
-        saveProcessedTitles();
-        System.out.println("새로 처리된 공지사항 수: " + newNoticesCount);
+        saveProcessedTitles(directory);
+        System.out.println(noticeType + " 새로 처리된 공지사항 수: " + newNoticesCount);
     }
 
     private static SSLSocketFactory createSSLSocketFactory() {
@@ -151,7 +169,7 @@ public class Main {
         }
     }
 
-    private static NoticeDto crawlNotice(Element link) throws IOException {
+    private static NoticeDto crawlNotice(Element link, String noticeType) throws IOException {
         String contentUrl = link.absUrl("href");
         Document contentDoc = Jsoup.connect(contentUrl)
                 .userAgent(USER_AGENT)
@@ -167,6 +185,11 @@ public class Main {
         notice.setContent(content);
         notice.setDate(contentDoc.select(".meta_item").first().text());
         notice.setUrl(contentUrl);
+        notice.setType(noticeType);
+
+        Element contentBody = contentDoc.select("div.content-body").first();
+        Map<String, Object> parsedContent = parseHtmlContent(contentBody);
+        notice.setParsedContent(parsedContent);
 
         String prompt = String.format(
                 """
@@ -179,7 +202,6 @@ public class Main {
                 4. 친근하면서도 예의 바른 존댓말 사용 (예: ~입니다, ~니다)
                 5. 전문용어가 있다면 쉬운 말로 풀어서 설명
                 6. 마감기한이나 신청기간이 있다면 ❗ 이모지와 함께 강조
-
                 
                 제목: %s
                 
@@ -191,10 +213,6 @@ public class Main {
 
         String summary = GeminiService.generateSummary(prompt);
         notice.setAiSummary(summary);
-
-        Element contentBody = contentDoc.select("div.content-body").first();
-        Map<String, Object> parsedContent = parseHtmlContent(contentBody);
-        notice.setParsedContent(parsedContent);
 
         return notice;
     }
@@ -254,11 +272,10 @@ public class Main {
         return tableData;
     }
 
-    private static void saveNoticeAsJson(NoticeDto notice, int index) {
+    private static void saveNoticeAsJson(NoticeDto notice, int index, String directory) {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        // 최신글이 더 큰 타임스탬프를 갖도록 처리
         long timestamp = System.currentTimeMillis() + (maxNotices - index);
-        String fileName = String.format("%s/notice_%d.json", JSON_DIRECTORY, timestamp);
+        String fileName = String.format("%s/notice_%d.json", directory, timestamp);
 
         try (FileWriter writer = new FileWriter(fileName)) {
             gson.toJson(notice, writer);
@@ -275,6 +292,7 @@ class NoticeDto {
     private String content;
     private String date;
     private String url;
+    private String type;
     private String aiSummary;
     private Map<String, Object> parsedContent;
 
@@ -290,4 +308,6 @@ class NoticeDto {
     public void setParsedContent(Map<String, Object> parsedContent) { this.parsedContent = parsedContent; }
     public String getAiSummary() { return aiSummary; }
     public void setAiSummary(String aiSummary) { this.aiSummary = aiSummary; }
+    public String getType() { return type; }
+    public void setType(String type) { this.type = type; }
 }
