@@ -8,7 +8,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
+import java.util.stream.Collectors;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -51,6 +57,28 @@ public class ScholarshipActivity extends AppCompatActivity {
             public void onResponse(Call<List<Notice>> call, Response<List<Notice>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     List<Notice> notices = response.body();
+
+                    // 빈 json 객체가 들어올 때 필터링 하여 빼버리는 로직
+                    notices = notices.stream()
+                            .filter(n -> n.getDate() != null && !n.getDate().trim().isEmpty())
+                            .collect(Collectors.toList());
+
+                    // 최신순 정렬
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd", Locale.getDefault());
+                    Collections.sort(notices, new Comparator<Notice>() {
+                        @Override
+                        public int compare(Notice o1, Notice o2) {
+                            try {
+                                String dateStr1 = o1.getDate().trim();
+                                String dateStr2 = o2.getDate().trim();
+                                return sdf.parse(dateStr2).compareTo(sdf.parse(dateStr1)); // 최신순
+                            } catch (ParseException e) {
+                                e.printStackTrace();
+                                return 0;
+                            }
+                        }
+                    });
+
                     noticeAdapter = new NoticeAdapter(notices);
                     noticeRecyclerView.setAdapter(noticeAdapter);
                 } else {
