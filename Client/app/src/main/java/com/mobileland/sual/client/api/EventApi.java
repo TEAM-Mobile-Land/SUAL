@@ -6,6 +6,6 @@ import retrofit2.Call;
 import retrofit2.http.GET;
 
 public interface EventApi {
-    @GET("api/event-notices")
+    @GET("api/notices/event")
     Call<List<Notice>> getEventNotices();
 }

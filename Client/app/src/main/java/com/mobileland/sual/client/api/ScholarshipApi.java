@@ -7,6 +7,6 @@ import retrofit2.Call;
 import retrofit2.http.GET;
 
 public interface ScholarshipApi {
-    @GET("api/notices")
+    @GET("api/notices/scholarship")
     Call<List<Notice>> getScholarshipNotices();
 }
