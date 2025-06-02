@@ -248,6 +248,7 @@
 
                 <!-- 공지 버튼들 -->
                 <com.google.android.material.button.MaterialButton
+                    android:id="@+id/scholarshipButton"
                     android:layout_width="match_parent"
                     android:layout_height="65dp"
                     android:layout_marginBottom="2dp"
@@ -259,6 +260,7 @@
                     app:backgroundTint="#E2F1FD" />
 
                 <com.google.android.material.button.MaterialButton
+                    android:id="@+id/eventNoticeButton"
                     android:layout_width="match_parent"
                     android:layout_height="65dp"
                     android:layout_marginBottom="2dp"
@@ -270,6 +272,7 @@
                     app:backgroundTint="#E2F1FD" />
 
                 <com.google.android.material.button.MaterialButton
+                    android:id="@+id/academicNoticeButton"
                     android:layout_width="match_parent"
                     android:layout_height="65dp"
                     android:layout_marginBottom="2dp"

@@ -4,5 +4,6 @@
     <color name="white">#FFFFFFFF</color>
     <color name="primary300">#84CEFF</color>
     <color name="primary500">#58AAFF</color>
+    <color name="primary700">#2196F3</color>
     <color name="nav_background">#FAFAFA</color>
 </resources>

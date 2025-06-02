@@ -28,7 +28,7 @@ public class Main {
     private static final String EVENT_DIRECTORY = BASE_DIRECTORY + "/event";
 
     private static Map<String, Set<String>> processedTitles = new HashMap<>();
-    private static final int maxNotices = 1;
+    private static final int maxNotices = 10;
 
     public static void main(String[] args) {
         try {
