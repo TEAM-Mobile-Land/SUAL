@@ -63,3 +63,6 @@ build/
 ehthumbs.db
 Thumbs.db
 config.properties.template
+
+# firebase server key
+src/main/resources/firebase/
