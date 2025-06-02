@@ -1,6 +1,7 @@
 package com.mobileland.sual.client;
 
 import android.os.Bundle;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -8,8 +9,14 @@ import androidx.appcompat.app.AppCompatActivity;
 public class NoticeDetailActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notice_detail);
+
+        ImageButton closeBtn = findViewById(R.id.closeButton);
+        closeBtn.setOnClickListener(v -> {
+            finish();
+        });
 
         TextView titleText = findViewById(R.id.detailTitle);
         TextView dateText = findViewById(R.id.detailDate);
