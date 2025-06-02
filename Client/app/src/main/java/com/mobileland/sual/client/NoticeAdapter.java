@@ -1,5 +1,6 @@
 package com.mobileland.sual.client;
 
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,6 +31,15 @@ public class NoticeAdapter extends RecyclerView.Adapter<NoticeAdapter.NoticeView
         Notice notice = noticeList.get(position);
         holder.titleText.setText(notice.getTitle());
         holder.dateText.setText(notice.getDate());
+
+        holder.itemView.setOnClickListener(v -> {
+            Intent intent = new Intent(v.getContext(), NoticeDetailActivity.class);
+            intent.putExtra("title", notice.getTitle());
+            intent.putExtra("date", notice.getDate());
+            intent.putExtra("aiSummary", notice.getAiSummary());
+            intent.putExtra("url", notice.getUrl());
+            v.getContext().startActivity(intent);
+        });
     }
 
     @Override
