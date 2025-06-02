@@ -1,5 +1,8 @@
 package com.mobileland.sual.client;
 
+import android.os.Bundle;
+import android.widget.TextView;
+
 import com.mobileland.sual.client.api.EventApi;
 
 import java.util.List;
@@ -9,6 +12,14 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class EventActivity extends BaseNoticeActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        TextView titleTextView = findViewById(R.id.noticeTitle);
+        titleTextView.setText("행사 공지");
+    }
 
     @Override
     protected Call<List<Notice>> getNoticeCall() {

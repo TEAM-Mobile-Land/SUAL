@@ -12,8 +12,7 @@
         android:layout_marginBottom="12dp">
 
         <TextView
-            android:id="@+id/scholarshipTitle"
-            android:text="장학 공지"
+            android:id="@+id/noticeTitle"
             android:textSize="35sp"
             android:textStyle="bold"
             android:layout_width="wrap_content"
