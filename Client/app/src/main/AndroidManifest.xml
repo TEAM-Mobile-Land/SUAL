@@ -62,6 +62,9 @@
             android:name=".AcademicActivity"
             android:exported="true"/>
 
+        <!--상세 페이지 레이아웃-->
+        <activity android:name=".NoticeDetailActivity" />
+
     </application>
 
 </manifest>
