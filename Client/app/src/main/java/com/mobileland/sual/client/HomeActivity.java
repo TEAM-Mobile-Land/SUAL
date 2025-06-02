@@ -1,10 +1,14 @@
 package com.mobileland.sual.client;
 
 import android.os.Bundle;
+import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.kakao.sdk.user.UserApiClient;
 
 public class HomeActivity extends AppCompatActivity {
 
@@ -13,6 +17,38 @@ public class HomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
+        // 🔹 FCM 토픽 구독
+        FirebaseMessaging.getInstance().subscribeToTopic("all")
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Log.d("FCM", "✅ all 토픽 구독 성공");
+                    } else {
+                        Log.e("FCM", "❌ all 토픽 구독 실패", task.getException());
+                    }
+                });
+
+        // 🔹 카카오 사용자 정보 가져오기
+        UserApiClient.getInstance().me((user, error) -> {
+            if (error != null) {
+                Log.e("HomeActivity", "사용자 정보 요청 실패", error);
+            } else if (user != null) {
+                if (user.getKakaoAccount() != null) {
+                    String email = user.getKakaoAccount().getEmail();
+                    if (email != null) {
+                        Log.i("HomeActivity", "이메일: " + email);
+                    } else {
+                        Log.w("HomeActivity", "이메일 정보 없음 (사용자 동의 X)");
+                    }
+                } else {
+                    Log.w("HomeActivity", "KakaoAccount 정보 없음");
+                }
+            } else {
+                Log.w("HomeActivity", "user 객체가 null입니다.");
+            }
+            return null;
+        });
+
+        // 🔹 하단 네비게이션 프래그먼트 처리
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
         bottomNav.setOnItemSelectedListener(item -> {
 
@@ -29,16 +65,17 @@ public class HomeActivity extends AppCompatActivity {
                 selectedFragment = new MyFragment();
             }
 
-
-            getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.fragment_container, selectedFragment)
-                    .commit();
+            if (selectedFragment != null) {
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.fragment_container, selectedFragment)
+                        .commit();
+            }
 
             return true;
         });
 
-        // 기본 프래그먼트 설정
+        // 🔹 기본 프래그먼트 설정
         if (savedInstanceState == null) {
             bottomNav.setSelectedItemId(R.id.menu_home);
         }

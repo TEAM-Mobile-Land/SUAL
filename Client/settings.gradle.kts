@@ -15,8 +15,9 @@ dependencyResolutionManagement {
         mavenCentral()
         // 카카오 저장소
         maven { url = uri("https://devrepo.kakao.com/nexus/content/groups/public/") }
+
+        maven { url = uri("https://jitpack.io") }
     }
 }
-
 rootProject.name = "SUAL_Client"
 include(":app")
