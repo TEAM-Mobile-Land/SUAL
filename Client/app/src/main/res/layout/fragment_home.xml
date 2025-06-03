@@ -72,7 +72,7 @@
                     android:id="@+id/calendarView"
                     android:layout_width="match_parent"
                     android:layout_height="304dp"
-                    android:layout_marginBottom="8dp" />
+                    android:layout_marginBottom="0dp" />
 
 
                 <com.google.android.material.chip.ChipGroup
