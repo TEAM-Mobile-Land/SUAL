@@ -40,7 +40,7 @@
                 android:id="@+id/MenuBtn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="10dp"
+                android:layout_marginEnd="5dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -64,7 +64,7 @@
 
                 <View
                     android:layout_width="match_parent"
-                    android:layout_height="10dp" />
+                    android:layout_height="6dp" />
 
                 <CalendarView
                     android:id="@+id/calendarView"
@@ -75,44 +75,41 @@
                 <!-- 알림 박스 -->
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/meal_border_box"
+                    android:layout_height="60dp"
                     android:orientation="horizontal"
-                    android:padding="8dp"
+                    android:padding="4dp"
                     android:layout_marginBottom="8dp">
 
                     <com.google.android.material.chip.ChipGroup
                         android:id="@+id/scheduleChipGroup"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:padding="4dp"
-                        app:singleLine="false"
-                        app:chipSpacing="8dp"
-                        app:lineSpacing="4dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:padding="0dp"
+                        app:singleLine="true"
+                        app:chipSpacing="4dp"
                         app:singleSelection="false"
                         app:selectionRequired="false" />
 
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:gravity="center"
-                        android:orientation="horizontal">
+<!--                    <LinearLayout-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="match_parent"-->
+<!--                        android:gravity="center"-->
+<!--                        android:orientation="horizontal">-->
 
-                        <ImageView
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:src="@drawable/ic_baseline_notifications_24"
-                            app:tint="#2196F3" />
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="알림받기"
-                            android:textStyle="bold"
-                            android:textColor="#2196F3"
-                            android:textSize="14sp"
-                            android:layout_marginStart="4dp" />
-                    </LinearLayout>
+<!--                        <ImageView-->
+<!--                            android:layout_width="20dp"-->
+<!--                            android:layout_height="20dp"-->
+<!--                            android:src="@drawable/ic_baseline_notifications_24"-->
+<!--                            app:tint="#2196F3" />-->
+<!--                        <TextView-->
+<!--                            android:layout_width="wrap_content"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            android:text="알림받기"-->
+<!--                            android:textStyle="bold"-->
+<!--                            android:textColor="#2196F3"-->
+<!--                            android:textSize="14sp"-->
+<!--                            android:layout_marginStart="4dp" />-->
+<!--                    </LinearLayout>-->
                 </LinearLayout>
 
                 <!-- 식단 박스 -->

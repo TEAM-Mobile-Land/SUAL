@@ -3,9 +3,10 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="primary300">#e8f5ff</color>
+    <color name="primary400">#87c1ff</color>
     <color name="primary500">#58AAFF</color>
     <color name="primary700">#2196F3</color>
-    <color name="primary900">#199cff</color>
+    <color name="primary900">#6b9fd6</color>
     <color name="nav_background">#FAFAFA</color>
     <color name="gray600">#8E8E8E</color>
 </resources>

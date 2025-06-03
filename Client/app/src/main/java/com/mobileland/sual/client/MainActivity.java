@@ -3,15 +3,25 @@ package com.mobileland.sual.client;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.content.res.Configuration;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.kakao.sdk.user.UserApiClient;
 
+import java.util.Locale;
+
 public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Locale locale = new Locale("ko");
+        Locale.setDefault(locale);
+        Configuration config = getResources().getConfiguration();
+        config.setLocale(locale);
+        getResources().updateConfiguration(config, getResources().getDisplayMetrics());
+
 
         UserApiClient.getInstance().me((user, error) -> {
             if (error != null) {

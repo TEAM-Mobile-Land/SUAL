@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.chip.*;
+import com.google.android.material.shape.CornerFamily;
 
 import java.io.*;
 import java.util.*;
@@ -69,13 +70,17 @@ public class HomeFragment extends Fragment {
         return cal;
     }
 
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
         CalendarView calendarView = view.findViewById(R.id.calendarView);
+
+
         Map<String, List<String>> scheduleMap = readScheduleData(getContext());
+
 
         calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
@@ -94,6 +99,15 @@ public class HomeFragment extends Fragment {
                         chip.setTextColor(ContextCompat.getColor(getContext(), R.color.white));
                         chip.setClickable(false);
                         chip.setCheckable(false);
+                        chip.setChipStrokeWidth(0f);
+                        chip.setChipStrokeColorResource(android.R.color.transparent);
+                        chip.post(() -> {
+                            chip.setShapeAppearanceModel(
+                                    chip.getShapeAppearanceModel().toBuilder()
+                                            .setAllCornerSizes(chip.getHeight() / 2f)
+                                            .build()
+                            );
+                        });
                         chipGroup.addView(chip);
                     }
                 } else {
@@ -103,7 +117,16 @@ public class HomeFragment extends Fragment {
                     noEventChip.setTextColor(ContextCompat.getColor(getContext(), R.color.white));
                     noEventChip.setClickable(false);
                     noEventChip.setCheckable(false);
+                    noEventChip.setChipStrokeWidth(0f);
+                    noEventChip.setChipStrokeColorResource(android.R.color.transparent);
                     chipGroup.addView(noEventChip);
+                    noEventChip.post(() -> {
+                        noEventChip.setShapeAppearanceModel(
+                                noEventChip.getShapeAppearanceModel().toBuilder()
+                                        .setAllCornerSizes(noEventChip.getHeight() / 2f)
+                                        .build()
+                        );
+                    });
                 }
             }
         });
