@@ -17,6 +17,14 @@ import java.util.*;
 
 public class HomeFragment extends Fragment {
 
+    // 요일 반환 메서드
+    private String getDayOfWeekKor(int year, int month, int day) {
+        Calendar cal = Calendar.getInstance();
+        cal.set(year, month, day);
+        String[] days = {"일", "월", "화", "수", "목", "금", "토"};
+        return days[cal.get(Calendar.DAY_OF_WEEK) - 1];
+    }
+
     private Map<String, List<String>> readScheduleData(Context context) {
         Map<String, List<String>> scheduleMap = new HashMap<>();
         try {
@@ -113,6 +121,12 @@ public class HomeFragment extends Fragment {
         calendarView.setOnDateChangeListener((view1, year, month, dayOfMonth) -> {
             String selectedDate = String.format(Locale.getDefault(), "%04d-%02d-%02d", year, month + 1, dayOfMonth);
             updateChipsForDate(selectedDate, chipGroup, scheduleMap);
+
+            // 홈 화면 상단에 날짜 띄우기
+            TextView todayDateText = getView().findViewById(R.id.todayDateText);
+            todayDateText.setText(String.format(Locale.getDefault(), "%04d년 %d월 %d일 (%s)",
+                    year, month + 1, dayOfMonth, getDayOfWeekKor(year, month, dayOfMonth)));
+
         });
 
         MaterialButton scholarBtn = view.findViewById(R.id.scholarshipButton);
