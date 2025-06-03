@@ -1,15 +1,35 @@
+# ✅ Android/IntelliJ
 *.iml
-.gradle
-/local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
+.idea/
 .DS_Store
-/build
-/captures
-.externalNativeBuild
-.cxx
+
+# ✅ Gradle build system
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.properties
+!gradle/wrapper/gradle-wrapper.jar
+
+# ✅ Android local config
 local.properties
+/local.properties
+
+# ✅ Android Studio files
+.cxx/
+.externalNativeBuild/
+captures/
+
+#firebase google-services
+Client/app/google-services.json
+
+# ✅ IntelliJ specific
+.idea/caches
+.idea/libraries
+.idea/modules.xml
+.idea/workspace.xml
+.idea/navEditor.xml
+.idea/assetWizardSettings.xml
+
+# ✅ Server 쪽도 동일 적용 원한다면 (루트 기준일 경우)
+Server/.gradle/
+Server/build/
+Server/.idea/

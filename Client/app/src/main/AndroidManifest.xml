@@ -4,6 +4,7 @@
     package="com.mobileland.sual.client">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 
     <application
         android:name=".GlobalApplication"
@@ -64,6 +65,15 @@
 
         <!--상세 페이지 레이아웃-->
         <activity android:name=".NoticeDetailActivity" />
+
+        <service
+            android:name=".MyFirebaseMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+            </intent-filter>
+        </service>
+
 
     </application>
 
