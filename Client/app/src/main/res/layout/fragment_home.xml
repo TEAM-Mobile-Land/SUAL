@@ -68,18 +68,25 @@
                 </LinearLayout>
 
                 <!-- 달력 -->
-                <CalendarView
-                    android:id="@+id/calendarView"
+                <FrameLayout
                     android:layout_width="match_parent"
-                    android:layout_height="304dp"
-                    android:layout_marginBottom="0dp" />
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/meal_border_box"
+                    android:layout_margin="8dp"
+                    android:padding="8dp">
 
+                    <CalendarView
+                        android:id="@+id/calendarView"
+                        android:layout_width="match_parent"
+                        android:layout_height="300dp"
+                        android:layout_marginBottom="0dp" />
+                </FrameLayout>
 
                 <com.google.android.material.chip.ChipGroup
                     android:id="@+id/scheduleChipGroup"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_marginBottom="0dp"
+                    android:layout_marginBottom="3dp"
                     android:gravity="start"
                     android:padding="0dp"
                     app:chipSpacing="4dp"
@@ -89,31 +96,31 @@
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="120dp"
-                    android:weightSum="2"
+                    android:layout_height="93dp"
+                    android:layout_marginBottom="4dp"
                     android:orientation="horizontal"
-                    android:layout_marginBottom="4dp">
+                    android:weightSum="2">
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/campusMealsButton"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:minHeight="0dp"
-                        android:minWidth="0dp"
-                        android:insetTop="0dp"
-                        android:insetBottom="0dp"
-                        android:insetLeft="0dp"
-                        android:insetRight="0dp"
-                        android:padding="0dp"
                         android:layout_marginEnd="6dp"
+                        android:layout_weight="1"
                         android:gravity="center"
+                        android:insetLeft="0dp"
+                        android:insetTop="0dp"
+                        android:insetRight="0dp"
+                        android:insetBottom="0dp"
+                        android:minWidth="0dp"
+                        android:minHeight="0dp"
+                        android:padding="0dp"
                         android:text="주간 식단표"
                         android:textColor="#2196F3"
                         android:textSize="18sp"
                         android:textStyle="bold"
-                        app:cornerRadius="12dp"
-                        app:backgroundTint="#E2F1FD" />
+                        app:backgroundTint="#E2F1FD"
+                        app:cornerRadius="12dp" />
 
                     <LinearLayout
                         android:id="@+id/campusMealsMenuBox"
