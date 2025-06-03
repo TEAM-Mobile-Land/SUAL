@@ -50,7 +50,7 @@
         <!-- 메인 스크롤 화면 -->
         <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="0dp"
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"
             app:layout_constraintTop_toBottomOf="@id/UpLayout"
@@ -62,12 +62,10 @@
                 android:orientation="vertical"
                 android:padding="8dp">
 
-                <!-- 여기에 상단 여백 추가 -->
                 <View
                     android:layout_width="match_parent"
-                    android:layout_height="50dp" />
+                    android:layout_height="10dp" />
 
-                <!-- 달력 -->
                 <CalendarView
                     android:id="@+id/calendarView"
                     android:layout_width="match_parent"
@@ -83,84 +81,18 @@
                     android:padding="8dp"
                     android:layout_marginBottom="8dp">
 
-                    <!-- 왼쪽 라벨 -->
-                    <LinearLayout
-                        android:layout_width="255dp"
+                    <com.google.android.material.chip.ChipGroup
+                        android:id="@+id/scheduleChipGroup"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:orientation="vertical">
+                        android:padding="4dp"
+                        app:singleLine="false"
+                        app:chipSpacing="8dp"
+                        app:lineSpacing="4dp"
+                        app:singleSelection="false"
+                        app:selectionRequired="false" />
 
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginBottom="2dp"
-                            android:orientation="horizontal"
-                            android:gravity="center_vertical">
-
-                            <View
-                                android:layout_width="8dp"
-                                android:layout_height="8dp"
-                                android:layout_marginEnd="4dp"
-                                android:background="@drawable/circle_dot"
-                                android:backgroundTint="#F28B82" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="중간고사"
-                                android:textSize="13sp" />
-
-                            <View
-                                android:layout_width="8dp"
-                                android:layout_height="8dp"
-                                android:layout_marginStart="12dp"
-                                android:layout_marginEnd="4dp"
-                                android:background="@drawable/circle_dot"
-                                android:backgroundTint="#81C995" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="수강정정"
-                                android:textSize="13sp" />
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:gravity="center_vertical">
-
-                            <View
-                                android:layout_width="8dp"
-                                android:layout_height="8dp"
-                                android:layout_marginEnd="4dp"
-                                android:background="@drawable/circle_dot"
-                                android:backgroundTint="#FBBC04" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="사랑나눔축제"
-                                android:textSize="13sp" />
-
-                            <View
-                                android:layout_width="8dp"
-                                android:layout_height="8dp"
-                                android:layout_marginStart="12dp"
-                                android:layout_marginEnd="4dp"
-                                android:background="@drawable/circle_dot"
-                                android:backgroundTint="#34A853" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="사랑나눔축제"
-                                android:textSize="13sp" />
-                        </LinearLayout>
-                    </LinearLayout>
-
-                    <!-- 오른쪽 알림 버튼 -->
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
@@ -213,7 +145,6 @@
                         android:orientation="vertical"
                         android:padding="8dp">
 
-                        <!-- 상단: 시간 + 한식 ▼ -->
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -236,7 +167,6 @@
                                 android:textColor="#333333" />
                         </LinearLayout>
 
-                        <!-- 하단: 메뉴 리스트 -->
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -285,9 +215,4 @@
             </LinearLayout>
         </ScrollView>
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <com.google.android.material.navigation.NavigationView
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_gravity="end" />
 </androidx.drawerlayout.widget.DrawerLayout>
