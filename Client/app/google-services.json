@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "298596866657",
+    "project_id": "sual-notice",
+    "storage_bucket": "sual-notice.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:298596866657:android:08a3d2ec3d12a8c23ae820",
+        "android_client_info": {
+          "package_name": "com.mobileland.sual.client"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCLDLWde1u8A9VaMte60ljQTRinpPgCcrg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
