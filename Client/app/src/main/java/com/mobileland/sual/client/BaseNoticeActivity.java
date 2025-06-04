@@ -74,6 +74,7 @@ public abstract class BaseNoticeActivity extends AppCompatActivity {
 
                     noticeAdapter = new NoticeAdapter(notices);
                     noticeRecyclerView.setAdapter(noticeAdapter);
+
                 } else {
                     Toast.makeText(BaseNoticeActivity.this, "응답 실패", Toast.LENGTH_SHORT).show();
                 }

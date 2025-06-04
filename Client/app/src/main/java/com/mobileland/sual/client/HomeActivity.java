@@ -1,8 +1,12 @@
 package com.mobileland.sual.client;
 
+import android.app.AlarmManager;
+import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,6 +18,8 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.kakao.sdk.user.UserApiClient;
 
 import android.Manifest;
+import android.widget.Toast;
+
 public class HomeActivity extends AppCompatActivity {
 
     @Override
@@ -33,6 +39,16 @@ public class HomeActivity extends AppCompatActivity {
                 requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS}, 1001);
             }
         }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+            if (!alarmManager.canScheduleExactAlarms()) {
+                Intent intent = new Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM);
+                startActivity(intent); // 사용자에게 권한 요청 화면 보여줌
+                Toast.makeText(this, "앱을 다시 실행해주세요.", Toast.LENGTH_LONG).show();
+                return;
+            }
+        }
+
 
 
         // 🔹 FCM 토픽 구독
@@ -50,18 +66,16 @@ public class HomeActivity extends AppCompatActivity {
             if (error != null) {
                 Log.e("HomeActivity", "사용자 정보 요청 실패", error);
             } else if (user != null) {
-                if (user.getKakaoAccount() != null) {
-                    String email = user.getKakaoAccount().getEmail();
-                    if (email != null) {
-                        Log.i("HomeActivity", "이메일: " + email);
-                    } else {
-                        Log.w("HomeActivity", "이메일 정보 없음 (사용자 동의 X)");
-                    }
-                } else {
-                    Log.w("HomeActivity", "KakaoAccount 정보 없음");
+                Long kakaoId = user.getId();  // 고유 ID
+                String nickname = null;
+
+                if (user.getKakaoAccount() != null && user.getKakaoAccount().getProfile() != null) {
+                    nickname = user.getKakaoAccount().getProfile().getNickname();  // 닉네임
                 }
-            } else {
-                Log.w("HomeActivity", "user 객체가 null입니다.");
+
+                Log.i("HomeActivity", "✅ 카카오 ID: " + kakaoId + ", 닉네임: " + nickname);
+
+                // TODO: 여기에 서버에 전송하거나 로컬 저장 등의 로직 추가 가능
             }
             return null;
         });
