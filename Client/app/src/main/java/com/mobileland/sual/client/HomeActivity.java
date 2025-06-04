@@ -30,7 +30,7 @@ public class HomeActivity extends AppCompatActivity {
         if (FirebaseApp.getApps(this).isEmpty()) {
             FirebaseApp.initializeApp(this);
         }
-        Log.d("Firebase", "✅ FirebaseApp initialized 상태: " + !FirebaseApp.getApps(this).isEmpty());
+        Log.d("Firebase", "FirebaseApp initialized 상태: " + !FirebaseApp.getApps(this).isEmpty());
 
 
         //알림 권한 런타임 요청
@@ -50,18 +50,17 @@ public class HomeActivity extends AppCompatActivity {
         }
 
 
-
-        // 🔹 FCM 토픽 구독
+        // FCM 토픽 구독
         FirebaseMessaging.getInstance().subscribeToTopic("all")
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        Log.d("FCM", "✅ all 토픽 구독 성공");
+                        Log.d("FCM", "all 토픽 구독 성공");
                     } else {
-                        Log.e("FCM", "❌ all 토픽 구독 실패", task.getException());
+                        Log.e("FCM", "all 토픽 구독 실패", task.getException());
                     }
                 });
 
-        // 🔹 카카오 사용자 정보 가져오기
+        // 카카오 사용자 정보 가져오기
         UserApiClient.getInstance().me((user, error) -> {
             if (error != null) {
                 Log.e("HomeActivity", "사용자 정보 요청 실패", error);
@@ -73,14 +72,14 @@ public class HomeActivity extends AppCompatActivity {
                     nickname = user.getKakaoAccount().getProfile().getNickname();  // 닉네임
                 }
 
-                Log.i("HomeActivity", "✅ 카카오 ID: " + kakaoId + ", 닉네임: " + nickname);
+                Log.i("HomeActivity", "카카오 ID: " + kakaoId + ", 닉네임: " + nickname);
 
                 // TODO: 여기에 서버에 전송하거나 로컬 저장 등의 로직 추가 가능
             }
             return null;
         });
 
-        // 🔹 하단 네비게이션 프래그먼트 처리
+        // 하단 네비게이션 프래그먼트 처리
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
         bottomNav.setOnItemSelectedListener(item -> {
 
@@ -107,7 +106,7 @@ public class HomeActivity extends AppCompatActivity {
             return true;
         });
 
-        // 🔹 기본 프래그먼트 설정
+        // 기본 프래그먼트 설정
         if (savedInstanceState == null) {
             bottomNav.setSelectedItemId(R.id.menu_home);
         }

@@ -1,7 +1,9 @@
 package com.mobileland.sual.client;
 
+import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.app.PendingIntent;
 import android.app.TimePickerDialog;
 import android.content.*;
 import android.os.*;
@@ -18,6 +20,7 @@ import com.google.android.material.chip.*;
 import android.content.res.Configuration;
 
 import java.io.*;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -151,8 +154,35 @@ public class HomeFragment extends Fragment {
     }
 
     private void registerNotification(String title, String datetime) {
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
+            Date date = sdf.parse(datetime);
+            long timeInMillis = date.getTime();
+
+            Intent intent = new Intent(requireContext(), NotificationReceiver.class);
+            intent.putExtra("notification_title", "📌 일정 알림: " + title);
+            intent.putExtra("notification_content", title + " 일정이 도착했습니다!");
+
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(
+                    requireContext(),
+                    (int) timeInMillis, // 고유 요청코드
+                    intent,
+                    PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+            );
+
+            AlarmManager alarmManager = (AlarmManager) requireContext().getSystemService(Context.ALARM_SERVICE);
+            if (alarmManager != null) {
+                alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, timeInMillis, pendingIntent);
+            }
+
+            Toast.makeText(requireContext(), "✅ 알림이 예약되었습니다", Toast.LENGTH_SHORT).show();
+        } catch (ParseException e) {
+            e.printStackTrace();
+            Toast.makeText(requireContext(), "❌ 날짜 형식 오류", Toast.LENGTH_SHORT).show();
+        }
+
         Log.d("알림등록", title + " → " + datetime + "에 알림 예약됨");
-        // TODO: Firebase Functions 과 연동
+
     }
 
     @Override
@@ -175,23 +205,44 @@ public class HomeFragment extends Fragment {
 
         CalendarView calendarView = view.findViewById(R.id.calendarView);
         ChipGroup chipGroup = view.findViewById(R.id.scheduleChipGroup);
+        TextView todayDateText = view.findViewById(R.id.todayDateText); // ✅ todayDateText 바인딩
+
         Map<String, List<String>> scheduleMap = readScheduleData(getContext());
 
+        // ✅ 오늘 날짜 관련 설정
         Calendar todayCal = Calendar.getInstance();
         String todayDate = String.format(Locale.getDefault(), "%04d-%02d-%02d",
                 todayCal.get(Calendar.YEAR), todayCal.get(Calendar.MONTH) + 1, todayCal.get(Calendar.DAY_OF_MONTH));
+
+        // ✅ 위쪽 날짜 텍스트뷰에 오늘 날짜 표시
+        String dayOfWeek = getDayOfWeekKor(
+                todayCal.get(Calendar.YEAR),
+                todayCal.get(Calendar.MONTH),
+                todayCal.get(Calendar.DAY_OF_MONTH)
+        );
+        String todayString = String.format(Locale.getDefault(), "%04d년 %d월 %d일 (%s)",
+                todayCal.get(Calendar.YEAR),
+                todayCal.get(Calendar.MONTH) + 1,
+                todayCal.get(Calendar.DAY_OF_MONTH),
+                dayOfWeek
+        );
+        todayDateText.setText(todayString);
+
+        // 달력에서 오늘 날짜 선택 상태로 보이게
+        calendarView.setDate(todayCal.getTimeInMillis(), true, true);
+
+        // 칩 업데이트
         updateChipsForDate(todayDate, chipGroup, scheduleMap);
 
+        // 날짜 선택 리스너
         calendarView.setOnDateChangeListener((view1, year, month, dayOfMonth) -> {
             String selectedDate = String.format(Locale.getDefault(), "%04d-%02d-%02d", year, month + 1, dayOfMonth);
             updateChipsForDate(selectedDate, chipGroup, scheduleMap);
-            TextView todayDateText = getView().findViewById(R.id.todayDateText);
             todayDateText.setText(String.format(Locale.getDefault(), "%04d년 %d월 %d일 (%s)",
                     year, month + 1, dayOfMonth, getDayOfWeekKor(year, month, dayOfMonth)));
         });
 
-
-
+        // 버튼 리스너
         MaterialButton scholarBtn = view.findViewById(R.id.scholarshipButton);
         MaterialButton eventBtn = view.findViewById(R.id.eventNoticeButton);
         MaterialButton academicBtn = view.findViewById(R.id.academicNoticeButton);
@@ -203,3 +254,4 @@ public class HomeFragment extends Fragment {
         return view;
     }
 }
+
