@@ -114,8 +114,7 @@ public class HomeFragment extends Fragment {
         new AlertDialog.Builder(requireContext())
                 .setTitle("알림 설정")
                 .setMessage(eventName + " 일정 알림을 언제 보내 드릴까요?")
-                .setPositiveButton("전날에 받고 싶어요!", (dialog, which) -> showDatePickerDialog(eventName))
-                .setNegativeButton("당일에 받고 싶어요!", (dialog, which) -> showDatePickerDialog(eventName))
+                .setNegativeButton("+ 날짜/시간 설정", (dialog, which) -> showDatePickerDialog(eventName))
                 .setNeutralButton("취소", null)
                 .show();
     }
