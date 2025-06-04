@@ -1,22 +1,27 @@
 package com.mobileland.sual.client;
 
+import android.app.AlertDialog;
+import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
 import android.content.*;
 import android.os.*;
+import android.util.Log;
 import android.view.*;
 import android.widget.*;
 
-import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.chip.*;
-import androidx.appcompat.app.AlertDialog;
 
 import java.io.*;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class HomeFragment extends Fragment {
+
+    private final Calendar calendar = Calendar.getInstance();
 
     // 요일 반환 메서드
     private String getDayOfWeekKor(int year, int month, int day) {
@@ -77,14 +82,11 @@ public class HomeFragment extends Fragment {
                 chip.setText(event);
                 chip.setChipBackgroundColorResource(R.color.primary500);
                 chip.setTextColor(ContextCompat.getColor(getContext(), R.color.white));
-                chip.setClickable(false);
+                chip.setClickable(true);
                 chip.setCheckable(false);
                 chip.setChipStrokeWidth(0f);
                 chip.setChipStrokeColorResource(android.R.color.transparent);
-
-                // chip에 클릭 이벤트 추가!
                 chip.setOnClickListener(v -> showAlertDialog(event));
-
                 chip.post(() -> chip.setShapeAppearanceModel(
                         chip.getShapeAppearanceModel().toBuilder()
                                 .setAllCornerSizes(chip.getHeight() / 2f)
@@ -108,30 +110,57 @@ public class HomeFragment extends Fragment {
         }
     }
 
-    // showAlertDialog 함수 -> 일정 chip을 클릭했을 때 일정 알림 예약 모달 띄우기
     private void showAlertDialog(String eventName) {
         new AlertDialog.Builder(requireContext())
                 .setTitle("알림 설정")
                 .setMessage(eventName + " 일정 알림을 언제 보내 드릴까요?")
-                .setPositiveButton("전날에 받고 싶어요!", (dialog, which) -> {
-                    // TODO: 알림 등록 로직
-                })
-                .setNegativeButton("당일에 받고 싶어요!", (dialog, which) -> {
-                    // TODO: 알림 등록 로직
-                })
+                .setPositiveButton("전날에 받고 싶어요!", (dialog, which) -> showDatePickerDialog(eventName))
+                .setNegativeButton("당일에 받고 싶어요!", (dialog, which) -> showDatePickerDialog(eventName))
                 .setNeutralButton("취소", null)
                 .show();
     }
 
+    private void showDatePickerDialog(String eventName) {
+        DatePickerDialog dateDialog = new DatePickerDialog(
+                requireContext(),
+                (view, year, month, dayOfMonth) -> showTimePickerDialog(year, month, dayOfMonth, eventName),
+                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH)
+        );
+        dateDialog.show();
+    }
+
+    private void showTimePickerDialog(int year, int month, int day, String eventName) {
+        Calendar now = Calendar.getInstance();
+        TimePickerDialog timePickerDialog = new TimePickerDialog(
+                requireContext(),
+                (timePicker, hour, minute) -> {
+                    Calendar alarmCal = Calendar.getInstance();
+                    alarmCal.set(year, month, day, hour, minute);
+                    String formatted = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
+                            .format(alarmCal.getTime());
+                    registerNotification(eventName, formatted);
+                },
+                now.get(Calendar.HOUR_OF_DAY),
+                now.get(Calendar.MINUTE),
+                true
+        );
+        timePickerDialog.show();
+    }
+
+    private void registerNotification(String title, String datetime) {
+        Log.d("알림등록", title + " → " + datetime + "에 알림 예약됨");
+        // TODO: Firebase Functions 과 연동
+    }
+
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
         CalendarView calendarView = view.findViewById(R.id.calendarView);
         ChipGroup chipGroup = view.findViewById(R.id.scheduleChipGroup);
         Map<String, List<String>> scheduleMap = readScheduleData(getContext());
-
 
         Calendar todayCal = Calendar.getInstance();
         String todayDate = String.format(Locale.getDefault(), "%04d-%02d-%02d",
@@ -141,12 +170,9 @@ public class HomeFragment extends Fragment {
         calendarView.setOnDateChangeListener((view1, year, month, dayOfMonth) -> {
             String selectedDate = String.format(Locale.getDefault(), "%04d-%02d-%02d", year, month + 1, dayOfMonth);
             updateChipsForDate(selectedDate, chipGroup, scheduleMap);
-
-            // 홈 화면 상단에 날짜 띄우기
             TextView todayDateText = getView().findViewById(R.id.todayDateText);
             todayDateText.setText(String.format(Locale.getDefault(), "%04d년 %d월 %d일 (%s)",
                     year, month + 1, dayOfMonth, getDayOfWeekKor(year, month, dayOfMonth)));
-
         });
 
         MaterialButton scholarBtn = view.findViewById(R.id.scholarshipButton);
