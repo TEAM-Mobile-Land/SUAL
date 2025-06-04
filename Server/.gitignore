@@ -54,8 +54,8 @@ buildNumber.properties
 .mvn/timing.properties
 
 # Gradle
-.gradle/
-build/
+#.gradle/
+#build/
 
 # OS 생성 파일
 .DS_Store

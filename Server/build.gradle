@@ -16,6 +16,7 @@ dependencies {
     implementation("com.google.cloud:google-cloud-vertexai:0.1.0")
     implementation(platform("com.google.cloud:libraries-bom:26.34.0"))
     implementation("com.google.cloud:google-cloud-core")
+    implementation 'org.json:json:20240303'
 }
 
 java {

@@ -1,27 +1,9 @@
-# ✅ Android/IntelliJ
+# ✅ 공통 무시 항목
 *.iml
-.idea/
 .DS_Store
 
-# ✅ Gradle build system
-.gradle/
-build/
-!gradle/wrapper/gradle-wrapper.properties
-!gradle/wrapper/gradle-wrapper.jar
-
-# ✅ Android local config
-local.properties
-/local.properties
-
-# ✅ Android Studio files
-.cxx/
-.externalNativeBuild/
-captures/
-
-#firebase google-services
-Client/app/google-services.json
-
-# ✅ IntelliJ specific
+# ✅ Android Studio / IntelliJ 설정
+.idea/
 .idea/caches
 .idea/libraries
 .idea/modules.xml
@@ -29,7 +11,30 @@ Client/app/google-services.json
 .idea/navEditor.xml
 .idea/assetWizardSettings.xml
 
-# ✅ Server 쪽도 동일 적용 원한다면 (루트 기준일 경우)
+# ✅ Android local config
+local.properties
+/local.properties
+
+# ✅ Gradle 빌드 결과
+.gradle/
+build/
+.cxx/
+.externalNativeBuild/
+captures/
+
+# ✅ gradle-wrapper만 제외
+!gradle/wrapper/gradle-wrapper.properties
+!gradle/wrapper/gradle-wrapper.jar
+
+# ✅ Firebase - 개인 키 제외
+Client/app/google-services.json
+
+# ✅ Client 전용
+Client/.gradle/
+Client/build/
+Client/.idea/
+
+# ✅ Server 전용
 Server/.gradle/
 Server/build/
 Server/.idea/

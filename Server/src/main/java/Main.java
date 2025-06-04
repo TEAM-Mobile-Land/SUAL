@@ -1,4 +1,3 @@
-import com.google.auth.oauth2.GoogleCredentials;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -6,16 +5,10 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.json.JSONObject;
 
 import javax.net.ssl.*;
 import java.io.*;
 import java.lang.reflect.Type;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 import java.util.*;
@@ -27,13 +20,12 @@ public class Main {
     private static final String EVENT_URL = "https://www.syu.ac.kr/university-square/notice/event/";
     private static final int CONNECTION_TIMEOUT = 10000;
     private static final int CRAWL_DELAY = 1000;
+    private static final Set<String> savedUrls = new HashSet<>();
 
     private static final String BASE_DIRECTORY = "crawled_json";
     private static final String ACADEMIC_DIRECTORY = BASE_DIRECTORY + "/academic";
     private static final String SCHOLARSHIP_DIRECTORY = BASE_DIRECTORY + "/scholarship";
     private static final String EVENT_DIRECTORY = BASE_DIRECTORY + "/event";
-    private static final String PROJECT_ID = "sual-notice";
-    private static final String SERVICE_ACCOUNT_PATH = "firebase/sual-notice-firebase-adminsdk-fbsvc-dd3c8067c4.json";
 
     private static Map<String, Set<String>> processedTitles = new HashMap<>();
     private static final int maxNotices = 1;
@@ -43,10 +35,18 @@ public class Main {
             createDirectories();
             disableSslVerification();
 
+            // 학사공지 크롤링
             crawl(ACADEMIC_URL, ACADEMIC_DIRECTORY, "academic");
-            crawl(SCHOLARSHIP_URL, SCHOLARSHIP_DIRECTORY, "scholarship");
-            crawl(EVENT_URL, EVENT_DIRECTORY, "event");
 
+            // 장학공지 크롤링 (URL이 추가되면 활성화)
+            if (!SCHOLARSHIP_URL.isEmpty()) {
+                crawl(SCHOLARSHIP_URL, SCHOLARSHIP_DIRECTORY, "scholarship");
+            }
+
+            // 행사공지 크롤링 (URL이 추가되면 활성화)
+            if (!EVENT_URL.isEmpty()) {
+                crawl(EVENT_URL, EVENT_DIRECTORY, "event");
+            }
         } catch (Exception e) {
             System.err.println("프로그램 실행 중 오류 발생: " + e.getMessage());
             e.printStackTrace();
@@ -66,10 +66,12 @@ public class Main {
                 Gson gson = new Gson();
                 Type setType = new TypeToken<HashSet<String>>(){}.getType();
                 Set<String> titles = gson.fromJson(reader, setType);
-                if (titles == null) titles = new HashSet<>();
+                if (titles == null) {
+                    titles = new HashSet<>();
+                }
                 processedTitles.put(directory, titles);
             } catch (IOException e) {
-                System.err.println("제목 목록 로드 오류: " + e.getMessage());
+                System.err.println("제목 목록 로드 중 오류 발생: " + e.getMessage());
                 processedTitles.put(directory, new HashSet<>());
             }
         } else {
@@ -82,7 +84,7 @@ public class Main {
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
             gson.toJson(processedTitles.get(directory), writer);
         } catch (IOException e) {
-            System.err.println("제목 저장 오류: " + e.getMessage());
+            System.err.println("제목 목록 저장 중 오류 발생: " + e.getMessage());
         }
     }
 
@@ -94,6 +96,7 @@ public class Main {
                     public void checkServerTrusted(X509Certificate[] certs, String authType) {}
                 }
         };
+
         SSLContext sc = SSLContext.getInstance("SSL");
         sc.init(null, trustAllCerts, new SecureRandom());
         HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
@@ -102,40 +105,171 @@ public class Main {
 
     private static void crawl(String targetUrl, String directory, String noticeType) throws IOException, InterruptedException {
         if (targetUrl.isEmpty()) return;
-        Document doc = Jsoup.connect(targetUrl).userAgent(USER_AGENT).timeout(CONNECTION_TIMEOUT).get();
-        Elements links = doc.select("td.step2 a");
 
+        Document doc = Jsoup.connect(targetUrl)
+                .userAgent(USER_AGENT)
+                .timeout(CONNECTION_TIMEOUT)
+                .ignoreHttpErrors(true)
+                .sslSocketFactory(createSSLSocketFactory())
+                .get();
+
+        Elements links = doc.select("td.step2 a");
+        System.out.println(noticeType + " 공지사항 발견된 수: " + links.size());
+
+        List<NoticeDto> notices = new ArrayList<>();
         loadProcessedTitles(directory);
+
         int processedCount = 0;
+        int newNoticesCount = 0;
 
         for (Element link : links) {
             if (processedCount >= maxNotices) break;
 
             String contentUrl = link.absUrl("href");
-            Document contentDoc = Jsoup.connect(contentUrl).userAgent(USER_AGENT).timeout(CONNECTION_TIMEOUT).get();
+            Document contentDoc = Jsoup.connect(contentUrl)
+                    .userAgent(USER_AGENT)
+                    .timeout(CONNECTION_TIMEOUT)
+                    .get();
             String title = contentDoc.select(".md_m_tit").text();
 
             Set<String> currentProcessedTitles = processedTitles.get(directory);
             if (currentProcessedTitles.contains(title)) {
-                System.out.println("이미 처리된 공지: " + title);
+                System.out.println("이미 처리된 공지입니다: " + title);
             } else {
-                NoticeDto notice = new NoticeDto();
-                notice.setTitle(title);
-                notice.setContent(contentDoc.select(".single_cont").text());
-                notice.setDate(contentDoc.select(".meta_item").first().text());
-                notice.setUrl(contentUrl);
-                notice.setType(noticeType);
-                notice.setParsedContent(new HashMap<>());
-
-                saveNoticeAsJson(notice, processedCount, directory);
-                sendFcmNotification(title);
-
-                currentProcessedTitles.add(title);
-                Thread.sleep(CRAWL_DELAY);
+                try {
+                    NoticeDto notice = crawlNotice(link, noticeType);
+                    notices.add(notice);
+                    currentProcessedTitles.add(title);
+                    saveNoticeAsJson(notice, processedCount, directory);
+                    newNoticesCount++;
+                    Thread.sleep(CRAWL_DELAY);
+                } catch (IOException e) {
+                    System.err.println("개별 URL 처리 중 오류 발생: " + contentUrl);
+                    e.printStackTrace();
+                }
             }
             processedCount++;
         }
+
         saveProcessedTitles(directory);
+        System.out.println(noticeType + " 새로 처리된 공지사항 수: " + newNoticesCount);
+    }
+
+    private static SSLSocketFactory createSSLSocketFactory() {
+        try {
+            SSLContext sslContext = SSLContext.getInstance("TLS");
+            sslContext.init(null, new TrustManager[]{new X509TrustManager() {
+                public void checkClientTrusted(X509Certificate[] chain, String authType) {}
+                public void checkServerTrusted(X509Certificate[] chain, String authType) {}
+                public X509Certificate[] getAcceptedIssuers() { return new X509Certificate[]{}; }
+            }}, new SecureRandom());
+            return sslContext.getSocketFactory();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static NoticeDto crawlNotice(Element link, String noticeType) throws IOException {
+        String contentUrl = link.absUrl("href");
+        Document contentDoc = Jsoup.connect(contentUrl)
+                .userAgent(USER_AGENT)
+                .timeout(CONNECTION_TIMEOUT)
+                .ignoreHttpErrors(true)
+                .sslSocketFactory(createSSLSocketFactory())
+                .get();
+
+        NoticeDto notice = new NoticeDto();
+        String title = contentDoc.select(".md_m_tit").text();
+        String content = contentDoc.select(".single_cont").text();
+        notice.setTitle(title);
+        notice.setContent(content);
+        notice.setDate(contentDoc.select(".meta_item").first().text());
+        notice.setUrl(contentUrl);
+        notice.setType(noticeType);
+
+        Element contentBody = contentDoc.select("div.content-body").first();
+        Map<String, Object> parsedContent = parseHtmlContent(contentBody);
+        notice.setParsedContent(parsedContent);
+
+        String prompt = String.format(
+                """
+                다음 공지사항을 대학생들이 빠르게 이해할 수 있도록 요약해주세요.
+                
+                규칙:
+                1. 반드시 알아야 할 중요 날짜나 기한이 있다면 ⏰ 이모지와 함께 먼저 표시
+                2. 핵심 내용을 3-4줄로 요약
+                3. 필요한 준비물이나 서류가 있다면 📝 이모지와 함께 목록 표시
+                4. 친근하면서도 예의 바른 존댓말 사용 (예: ~입니다, ~니다)
+                5. 전문용어가 있다면 쉬운 말로 풀어서 설명
+                6. 마감기한이나 신청기간이 있다면 ❗ 이모지와 함께 강조
+                
+                제목: %s
+                
+                내용: %s
+                """,
+                title,
+                content
+        );
+
+        String summary = GeminiService.generateSummary(prompt);
+        notice.setAiSummary(summary);
+
+        return notice;
+    }
+
+    private static Map<String, Object> parseHtmlContent(Element content) {
+        Map<String, Object> result = new HashMap<>();
+        if (content != null) {
+            Elements tables = content.select("table");
+            if (!tables.isEmpty()) {
+                result.put("tables", parseTablesContent(tables));
+            }
+            result.put("textContent", content.text());
+            Elements links = content.select("a");
+            if (!links.isEmpty()) {
+                result.put("links", parseLinks(links));
+            }
+            Elements images = content.select("img");
+            if (!images.isEmpty()) {
+                result.put("images", parseImages(images));
+            }
+        }
+        return result;
+    }
+
+    private static List<Map<String, String>> parseLinks(Elements links) {
+        List<Map<String, String>> linksList = new ArrayList<>();
+        for (Element link : links) {
+            Map<String, String> linkMap = new HashMap<>();
+            linkMap.put("text", link.text());
+            linkMap.put("href", link.attr("abs:href"));
+            linksList.add(linkMap);
+        }
+        return linksList;
+    }
+
+    private static List<String> parseImages(Elements images) {
+        List<String> imageUrls = new ArrayList<>();
+        for (Element image : images) {
+            imageUrls.add(image.attr("abs:src"));
+        }
+        return imageUrls;
+    }
+
+    private static List<List<String>> parseTablesContent(Elements tables) {
+        List<List<String>> tableData = new ArrayList<>();
+        for (Element table : tables) {
+            Elements rows = table.select("tr");
+            for (Element row : rows) {
+                List<String> rowData = new ArrayList<>();
+                Elements cells = row.select("td, th");
+                for (Element cell : cells) {
+                    rowData.add(cell.text());
+                }
+                tableData.add(rowData);
+            }
+        }
+        return tableData;
     }
 
     private static void saveNoticeAsJson(NoticeDto notice, int index, String directory) {
@@ -145,47 +279,10 @@ public class Main {
 
         try (FileWriter writer = new FileWriter(fileName)) {
             gson.toJson(notice, writer);
-            System.out.println("JSON 저장 완료: " + fileName);
+            System.out.println("JSON 파일 저장 완료: " + fileName);
         } catch (IOException e) {
-            System.err.println("JSON 저장 오류: " + fileName);
+            System.err.println("JSON 파일 저장 중 오류 발생: " + fileName);
             e.printStackTrace();
-        }
-    }
-
-    private static void sendFcmNotification(String title) {
-        try {
-            InputStream serviceAccount = Main.class.getClassLoader().getResourceAsStream(SERVICE_ACCOUNT_PATH);
-            if (serviceAccount == null) throw new IllegalStateException("❌ 서비스 계정 키를 찾을 수 없습니다.");
-
-            GoogleCredentials credentials = GoogleCredentials.fromStream(serviceAccount)
-                    .createScoped("https://www.googleapis.com/auth/firebase.messaging");
-            credentials.refreshIfExpired();
-            String accessToken = credentials.getAccessToken().getTokenValue();
-
-            JSONObject notification = new JSONObject();
-            notification.put("title", "새 공지");
-            notification.put("body", title);
-
-            JSONObject messageObject = new JSONObject();
-            messageObject.put("topic", "all");
-            messageObject.put("notification", notification);
-
-            JSONObject finalMessage = new JSONObject();
-            finalMessage.put("message", messageObject);
-
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create("https://fcm.googleapis.com/v1/projects/" + PROJECT_ID + "/messages:send"))
-                    .header("Authorization", "Bearer " + accessToken)
-                    .header("Content-Type", "application/json; UTF-8")
-                    .POST(HttpRequest.BodyPublishers.ofString(finalMessage.toString()))
-                    .build();
-
-            HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
-            System.out.println("📬 FCM 전송 완료: " + title);
-            System.out.println("응답: " + response.body());
-
-        } catch (Exception e) {
-            System.err.println("❌ FCM 전송 실패: " + e.getMessage());
         }
     }
 }
@@ -207,10 +304,10 @@ class NoticeDto {
     public void setDate(String date) { this.date = date; }
     public String getUrl() { return url; }
     public void setUrl(String url) { this.url = url; }
-    public String getType() { return type; }
-    public void setType(String type) { this.type = type; }
-    public String getAiSummary() { return aiSummary; }
-    public void setAiSummary(String aiSummary) { this.aiSummary = aiSummary; }
     public Map<String, Object> getParsedContent() { return parsedContent; }
     public void setParsedContent(Map<String, Object> parsedContent) { this.parsedContent = parsedContent; }
+    public String getAiSummary() { return aiSummary; }
+    public void setAiSummary(String aiSummary) { this.aiSummary = aiSummary; }
+    public String getType() { return type; }
+    public void setType(String type) { this.type = type; }
 }
