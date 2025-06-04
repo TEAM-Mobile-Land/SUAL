@@ -11,9 +11,11 @@ import android.widget.*;
 
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.annotation.NonNull;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.chip.*;
+import android.content.res.Configuration;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
@@ -154,6 +156,20 @@ public class HomeFragment extends Fragment {
     }
 
     @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+
+        // 한국어 Locale 강제 설정
+        Locale locale = Locale.KOREA;
+        Locale.setDefault(locale);
+
+        Configuration config = new Configuration();
+        config.setLocale(locale);
+
+        context.getResources().updateConfiguration(config, context.getResources().getDisplayMetrics());
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
@@ -173,6 +189,8 @@ public class HomeFragment extends Fragment {
             todayDateText.setText(String.format(Locale.getDefault(), "%04d년 %d월 %d일 (%s)",
                     year, month + 1, dayOfMonth, getDayOfWeekKor(year, month, dayOfMonth)));
         });
+
+
 
         MaterialButton scholarBtn = view.findViewById(R.id.scholarshipButton);
         MaterialButton eventBtn = view.findViewById(R.id.eventNoticeButton);
