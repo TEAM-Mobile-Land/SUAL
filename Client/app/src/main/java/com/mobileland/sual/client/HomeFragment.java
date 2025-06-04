@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.chip.*;
+import androidx.appcompat.app.AlertDialog;
 
 import java.io.*;
 import java.util.*;
@@ -80,6 +81,10 @@ public class HomeFragment extends Fragment {
                 chip.setCheckable(false);
                 chip.setChipStrokeWidth(0f);
                 chip.setChipStrokeColorResource(android.R.color.transparent);
+
+                // chip에 클릭 이벤트 추가!
+                chip.setOnClickListener(v -> showAlertDialog(event));
+
                 chip.post(() -> chip.setShapeAppearanceModel(
                         chip.getShapeAppearanceModel().toBuilder()
                                 .setAllCornerSizes(chip.getHeight() / 2f)
@@ -101,6 +106,21 @@ public class HomeFragment extends Fragment {
                             .build()));
             chipGroup.addView(noEventChip);
         }
+    }
+
+    // showAlertDialog 함수 -> 일정 chip을 클릭했을 때 일정 알림 예약 모달 띄우기
+    private void showAlertDialog(String eventName) {
+        new AlertDialog.Builder(requireContext())
+                .setTitle("알림 설정")
+                .setMessage(eventName + " 일정 알림을 언제 보내 드릴까요?")
+                .setPositiveButton("전날에 받고 싶어요!", (dialog, which) -> {
+                    // TODO: 알림 등록 로직
+                })
+                .setNegativeButton("당일에 받고 싶어요!", (dialog, which) -> {
+                    // TODO: 알림 등록 로직
+                })
+                .setNeutralButton("취소", null)
+                .show();
     }
 
     @Override
