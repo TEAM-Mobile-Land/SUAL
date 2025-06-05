@@ -139,7 +139,26 @@ public class MealFragment extends Fragment {
         });
 
         TextView title = view.findViewById(R.id.mealTitle);
-        title.setText("선택된 식사: " + mealType);
+        String displayName;
+
+        switch (mealType) {
+            case "breakfast":
+                displayName = "조식";
+                break;
+            case "lunch_korean":
+                displayName = "중식(한식)";
+                break;
+            case "lunch_special":
+                displayName = "중식(특식)";
+                break;
+            case "dinner":
+                displayName = "석식";
+                break;
+            default:
+                displayName = "식사 정보";
+        }
+
+        title.setText(displayName);
 
         updateDateView();
         loadMealData();
