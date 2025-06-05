@@ -7,6 +7,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:layout_margin="20dp"
         android:orientation="vertical">
 
         <TextView
@@ -23,7 +25,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="날짜"
-            android:textSize="24sp"
+            android:textSize="18sp"
             android:textColor="#777777"
             android:layout_marginBottom="8dp" />
 
@@ -33,6 +35,7 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center"
+
             android:layout_marginBottom="8dp">
 
             <ImageButton
@@ -52,13 +55,32 @@
                 android:padding="4dp" />
         </LinearLayout>
 
+
+        <!-- 식단 메뉴 박스 -->
         <TextView
             android:id="@+id/mealText"
+            android:background="@drawable/meal_border_box"
+            android:padding="15dp"
+            android:layout_margin="15dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textAlignment="center"
             android:text="식단 정보가 여기에 표시됩니다"
-            android:textSize="26sp"
+            android:textStyle="bold"
+            android:textSize="22sp"
             android:textColor="#333333" />
+
+        <!-- 가격 텍스트는 별도로 하단에 배치 -->
+        <TextView
+            android:id="@+id/priceText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:textColor= "@color/primary700"
+            android:gravity="center"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="8dp"/>
 
     </LinearLayout>
 </ScrollView>
