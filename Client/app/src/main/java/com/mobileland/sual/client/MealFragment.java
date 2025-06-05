@@ -12,6 +12,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import android.util.Log;
+
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -88,7 +90,12 @@ public class MealFragment extends Fragment {
                 JSONObject todayMeals = root.getJSONObject(today);
                 if (todayMeals.has(mealType)) {
                     JSONObject mealObj = todayMeals.getJSONObject(mealType);
-                    String menu = mealObj.getString("menu").replace("\\n", "\n");
+                    JSONArray menuArray = mealObj.getJSONArray("menu");
+                    StringBuilder menuBuilder = new StringBuilder();
+                    for (int i = 0; i < menuArray.length(); i++) {
+                        menuBuilder.append("• ").append(menuArray.getString(i)).append("\n");
+                    }
+                    String menu = menuBuilder.toString();
                     String price = mealObj.optString("price", "-");
 
                     textView.setText("\uD83D\uDCA1 메뉴\n\n" + menu + "\n\n\uD83D\uDCB0 가격: " + price + "원");

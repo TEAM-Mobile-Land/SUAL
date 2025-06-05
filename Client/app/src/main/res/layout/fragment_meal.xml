@@ -39,9 +39,9 @@
                 android:id="@+id/leftArrow"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
-                android:src="@drawable/ic_arrow_left"
                 android:contentDescription="이전 날짜"
-                android:padding="4dp" />
+                android:padding="4dp"
+                android:src="@drawable/ic_arrow_left" />
 
             <View
                 android:layout_width="16dp"
