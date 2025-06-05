@@ -55,6 +55,10 @@
             android:exported="true" />
 
         <activity
+            android:name=".MealActivity"
+            android:exported="true" />
+
+        <activity
             android:name=".ScholarshipActivity"
             android:exported="true" />
 
