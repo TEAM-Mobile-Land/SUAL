@@ -15,7 +15,7 @@
             android:layout_height="wrap_content"
             android:text="선택된 식사"
             android:textStyle="bold"
-            android:textSize="18sp" />
+            android:textSize="28sp" />
 
         <!-- 날짜 텍스트 -->
         <TextView
@@ -23,7 +23,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="날짜"
-            android:textSize="14sp"
+            android:textSize="24sp"
             android:textColor="#777777"
             android:layout_marginBottom="8dp" />
 
@@ -43,10 +43,6 @@
                 android:padding="4dp"
                 android:src="@drawable/ic_arrow_left" />
 
-            <View
-                android:layout_width="16dp"
-                android:layout_height="0dp" />
-
             <ImageButton
                 android:id="@+id/rightArrow"
                 android:layout_width="32dp"
@@ -61,7 +57,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="식단 정보가 여기에 표시됩니다"
-            android:textSize="16sp"
+            android:textSize="26sp"
             android:textColor="#333333" />
 
     </LinearLayout>

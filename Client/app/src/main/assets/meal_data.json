@@ -19,7 +19,7 @@
   },
   "2025-06-03": {
     "breakfast": {
-      "menu": [],
+      "menu": ["21대 대통령 선거"],
       "price": ""
     },
     "lunch_korean": {
@@ -27,11 +27,11 @@
       "price": ""
     },
     "lunch_special": {
-      "menu": [],
+      "menu": ["21대 대통령 선거"],
       "price": ""
     },
     "dinner": {
-      "menu": [],
+      "menu": ["21대 대통령 선거"],
       "price": ""
     }
   },
@@ -73,11 +73,11 @@
   },
   "2025-06-06": {
     "breakfast": {
-      "menu": [],
+      "menu": ["현충일"],
       "price": ""
     },
     "lunch_korean": {
-      "menu": [],
+      "menu": ["현충일"],
       "price": ""
     },
     "lunch_special": {
@@ -85,7 +85,7 @@
       "price": ""
     },
     "dinner": {
-      "menu": [],
+      "menu": ["현충일"],
       "price": ""
     }
   }
