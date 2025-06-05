@@ -242,7 +242,14 @@ public class HomeFragment extends Fragment {
                     year, month + 1, dayOfMonth, getDayOfWeekKor(year, month, dayOfMonth)));
         });
 
-        // 버튼 리스너
+        // 식단표 버튼 리스너
+        MaterialButton mealBtn = view.findViewById(R.id.campusMealsButton);
+        mealBtn.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), MealActivity.class);
+            startActivity(intent);
+        });
+
+        // 공지 버튼 리스너
         MaterialButton scholarBtn = view.findViewById(R.id.scholarshipButton);
         MaterialButton eventBtn = view.findViewById(R.id.eventNoticeButton);
         MaterialButton academicBtn = view.findViewById(R.id.academicNoticeButton);
