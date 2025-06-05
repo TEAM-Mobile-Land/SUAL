@@ -19,10 +19,14 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.chip.*;
 import android.content.res.Configuration;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.io.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+
 
 public class HomeFragment extends Fragment {
 
@@ -199,6 +203,22 @@ public class HomeFragment extends Fragment {
         context.getResources().updateConfiguration(config, context.getResources().getDisplayMetrics());
     }
 
+    private String getCurrentMealType() {
+        String currentTime = "";
+        int hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
+        if (hour < 10) {
+            currentTime = "breakfast";
+        }
+        else if (hour < 15) {
+            currentTime = "lunch_special";
+        }
+        else {
+            currentTime = "dinner";
+        }
+
+        return currentTime;
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
@@ -249,6 +269,66 @@ public class HomeFragment extends Fragment {
             startActivity(intent);
         });
 
+        // 오늘 메뉴 박스
+        TextView mealPreviewText = view.findViewById(R.id.mealPreviewText);
+
+
+
+        try {
+            InputStream is = requireContext().getAssets().open("meal_data.json");
+            BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+            StringBuilder jsonBuilder = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                jsonBuilder.append(line);
+            }
+
+            JSONObject root = new JSONObject(jsonBuilder.toString());
+            String today = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
+
+            if (root.has(today)) {
+                JSONObject todayMeals = root.getJSONObject(today);
+
+                String mealType = getCurrentMealType();  // ⬅️ 여기서 결정
+                if (todayMeals.has(mealType)) {
+                    JSONArray menuArray = todayMeals.getJSONObject(mealType).getJSONArray("menu");
+
+                    String timeRange = "";
+                    String mealName = "";
+                    switch (mealType) {
+                        case "breakfast":
+                            timeRange = "08:00~09:30";
+                            mealName = "조식 ";
+                            break;
+                        case "lunch_korean":
+                            timeRange = "11:30~14:00";
+                            mealName = "중식(한식) ";
+                            break;
+                        case "dinner":
+                            timeRange = "17:30~18:30";
+                            mealName = "석식 ";
+                            break;
+                    }
+                    TextView mealInfoText = view.findViewById(R.id.mealInfoText);
+                    mealInfoText.setText(mealName + timeRange);
+                    StringBuilder preview = new StringBuilder();
+                    for (int i = 0; i < menuArray.length(); i++) {
+                        preview.append(menuArray.getString(i));
+                        if (i != menuArray.length() - 1) preview.append(", ");
+                    }
+
+                    mealPreviewText.setText(preview.toString());
+                } else {
+                    mealPreviewText.setText("오늘 " + mealType + " 정보가 없습니다.");
+                }
+            } else {
+                mealPreviewText.setText("오늘 학식 정보 없음");
+            }
+
+        } catch (Exception e) {
+            mealPreviewText.setText("학식 로드 오류");
+            Log.e("HomeFragment", "meal_preview 에러", e);
+        }
         // 공지 버튼 리스너
         MaterialButton scholarBtn = view.findViewById(R.id.scholarshipButton);
         MaterialButton eventBtn = view.findViewById(R.id.eventNoticeButton);
