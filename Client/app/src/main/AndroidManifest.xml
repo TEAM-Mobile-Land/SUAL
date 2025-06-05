@@ -28,6 +28,11 @@
             android:exported="true">
         </activity>
 
+        <!-- setting activity -->
+        <activity
+            android:name=".SettingsActivity"
+            android:exported="true" />
+
         <!-- 카카오 로그인용 콜백 액티비티 -->
         <activity
             android:name="com.kakao.sdk.auth.AuthCodeHandlerActivity"
