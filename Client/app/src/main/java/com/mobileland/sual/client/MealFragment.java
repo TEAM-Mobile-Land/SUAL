@@ -45,7 +45,7 @@ public class MealFragment extends Fragment {
     private void updateDateView() {
         String formatted = new SimpleDateFormat("yyyy년 M월 d일 (E)", Locale.KOREA)
                 .format(calendar.getTime());
-        dateText.setText(formatted + " 11:30~14:00");
+        dateText.setText(formatted);
     }
 
     private void updateCalendarToAvailableDate() {
@@ -160,16 +160,16 @@ public class MealFragment extends Fragment {
         String displayName;
         switch (mealType) {
             case "breakfast":
-                title.setText("조식");
+                title.setText("조식\n(08:00~09:30)");
                 break;
             case "lunch_korean":
-                title.setText("중식(한식)");
+                title.setText("중식(한식)\n(11:30~14:00)");
                 break;
             case "lunch_special":
-                title.setText("중식(특식)");
+                title.setText("중식(특식)\n(11:30~14:00)");
                 break;
             case "dinner":
-                title.setText("석식");
+                title.setText("석식\n(17:30~18:30)");
                 break;
             default:
                 title.setText("식사 정보");
