@@ -17,7 +17,52 @@
             android:textStyle="bold"
             android:textSize="18sp" />
 
-        <!-- 식단 정보 텍스트 뷰 또는 리사이클러뷰 영역 -->
+        <!-- 날짜 텍스트 -->
+        <TextView
+            android:id="@+id/mealDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="날짜"
+            android:textSize="14sp"
+            android:textColor="#777777"
+            android:layout_marginBottom="8dp" />
+
+        <!-- 좌우 화살표 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginBottom="8dp">
+
+            <ImageButton
+                android:id="@+id/leftArrow"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/ic_arrow_left"
+                android:contentDescription="이전 날짜"
+                android:padding="4dp" />
+
+            <View
+                android:layout_width="16dp"
+                android:layout_height="0dp" />
+
+            <ImageButton
+                android:id="@+id/rightArrow"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/ic_arrow_right"
+                android:contentDescription="다음 날짜"
+                android:padding="4dp" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/mealText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="식단 정보가 여기에 표시됩니다"
+            android:textSize="16sp"
+            android:textColor="#333333" />
 
     </LinearLayout>
 </ScrollView>
