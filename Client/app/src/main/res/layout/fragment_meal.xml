@@ -7,80 +7,81 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
-        android:layout_margin="20dp"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:gravity="center_horizontal">
 
+        <!-- 식사명 -->
         <TextView
             android:id="@+id/mealTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="선택된 식사"
+            android:text="조식"
+            android:textSize="28sp"
             android:textStyle="bold"
-            android:textSize="28sp" />
+            android:layout_marginTop="12dp" />
 
-        <!-- 날짜 텍스트 -->
+        <!-- 날짜 -->
         <TextView
             android:id="@+id/mealDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="날짜"
+            android:text="2025년 6월 4일 (수) 11:30~14:00"
             android:textSize="18sp"
             android:textColor="#777777"
             android:layout_marginBottom="8dp" />
 
-        <!-- 좌우 화살표 -->
+        <!-- 메뉴 카드 + 화살표 -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center"
+            android:layout_marginVertical="12dp">
 
-            android:layout_marginBottom="8dp">
-
+            <!-- 왼쪽 화살표 -->
             <ImageButton
                 android:id="@+id/leftArrow"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:contentDescription="이전 날짜"
-                android:padding="4dp"
-                android:src="@drawable/ic_arrow_left" />
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_chevron_left"
+                android:contentDescription="이전 날짜"/>
 
+            <!-- 메뉴 박스 -->
+            <TextView
+                android:id="@+id/mealText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginHorizontal="12dp"
+                android:background="@drawable/meal_border_box"
+                android:padding="16dp"
+                android:text="식단 정보가 여기에 표시됩니다"
+                android:textSize="20sp"
+                android:gravity="center"
+                android:textStyle="bold"
+                android:textAlignment="center"
+                android:textColor="#333333" />
+
+            <!-- 오른쪽 화살표 -->
             <ImageButton
                 android:id="@+id/rightArrow"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:src="@drawable/ic_arrow_right"
-                android:contentDescription="다음 날짜"
-                android:padding="4dp" />
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_chevron_right"
+                android:contentDescription="다음 날짜"/>
         </LinearLayout>
 
-
-        <!-- 식단 메뉴 박스 -->
-        <TextView
-            android:id="@+id/mealText"
-            android:background="@drawable/meal_border_box"
-            android:padding="15dp"
-            android:layout_margin="15dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:textAlignment="center"
-            android:text="식단 정보가 여기에 표시됩니다"
-            android:textStyle="bold"
-            android:textSize="22sp"
-            android:textColor="#333333" />
-
-        <!-- 가격 텍스트는 별도로 하단에 배치 -->
+        <!-- 가격 텍스트 -->
         <TextView
             android:id="@+id/priceText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textColor="@color/primary700"
             android:textSize="20sp"
-            android:textColor= "@color/primary700"
-            android:gravity="center"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="8dp"/>
-
+            android:layout_gravity="center"
+            android:layout_marginTop="4dp"
+            android:text="가격 정보" />
     </LinearLayout>
 </ScrollView>
