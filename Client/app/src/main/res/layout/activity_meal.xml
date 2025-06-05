@@ -13,6 +13,22 @@
         app:tabSelectedTextColor="@color/primary700"
         app:tabTextColor="@color/primary900" />
 
+    <!-- 닫기 버튼 추가 (홈으로 이동하기) -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <ImageButton
+            android:id="@+id/closeMealButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_close"
+            android:contentDescription="닫기" />
+    </RelativeLayout>
+
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/viewPager"
         android:layout_width="match_parent"
