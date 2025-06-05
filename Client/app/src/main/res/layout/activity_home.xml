@@ -23,7 +23,7 @@
         app:itemIconTint="@color/nav_item_color"
         app:itemTextColor="@color/nav_item_color"
         app:itemBackground="@null"
-        android:background="@color/nav_background"
+        android:background="?attr/android:windowBackground"
         app:itemHorizontalTranslationEnabled="false"
         app:itemActiveIndicatorStyle="@style/Theme.SUAL_Client"
         app:itemRippleColor="@android:color/transparent"

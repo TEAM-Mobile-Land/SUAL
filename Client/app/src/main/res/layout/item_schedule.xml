@@ -16,5 +16,5 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="#2196F3" /> <!-- 파란색 -->
+        android:background="@drawable/meal_border_box"/>
 </LinearLayout>

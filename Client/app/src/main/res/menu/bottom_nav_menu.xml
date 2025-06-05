@@ -12,7 +12,7 @@
         android:icon="@drawable/ic_save"
         android:title="저장된 공지" />
     <item
-        android:id="@+id/menu_my"
-        android:icon="@drawable/ic_profile"
-        android:title="마이 페이지" />
+        android:id="@+id/menu_setting"
+        android:icon="@drawable/ic_settings"
+        android:title="다크모드" />
 </menu>

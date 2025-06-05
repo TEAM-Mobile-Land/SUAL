@@ -1,6 +1,6 @@
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- 내부 배경색 -->
-    <solid android:color="#FFFFFF" />
+    <solid android:color="?android:windowBackground" />
 
     <!-- 테두리 -->
     <stroke
