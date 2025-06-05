@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="35dp"
+        android:layout_marginBottom="25dp"
+        android:gravity="center_horizontal">
+
+
+        <!-- 날짜 -->
+        <TextView
+            android:id="@+id/mealDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="2025년 6월 4일 (수)"
+            android:textSize="38sp"
+            android:textStyle="bold"
+            android:textColor="#000000"
+            android:layout_marginBottom="32dp" />
+
+        <!-- 식사명 -->
+        <TextView
+            android:id="@+id/mealTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="조식"
+            android:textColor="@color/primary700"
+            android:gravity="center"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:layout_marginTop="12dp" />
+
+        <!-- 메뉴 카드 + 화살표 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginVertical="12dp">
+
+            <!-- 왼쪽 화살표 -->
+            <ImageButton
+                android:id="@+id/leftArrow"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_chevron_left"
+                android:contentDescription="이전 날짜"/>
+
+            <LinearLayout
+                android:layout_width="250dp"
+                android:layout_height="300dp"
+                android:gravity="center"
+                android:background="@drawable/meal_border_box"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/mealText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:textAlignment="center"
+                    android:textStyle="bold"
+                    android:textSize="20sp"
+                    android:textColor="#333333"
+                    android:padding="15dp"
+                    android:text="식단 정보" />
+            </LinearLayout>
+
+            <!-- 오른쪽 화살표 -->
+            <ImageButton
+                android:id="@+id/rightArrow"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_chevron_right"
+                android:contentDescription="다음 날짜"/>
+        </LinearLayout>
+
+        <!-- 가격 텍스트 -->
+        <TextView
+            android:id="@+id/priceText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/primary700"
+            android:textSize="20sp"
+            android:layout_gravity="center"
+            android:layout_marginTop="4dp"
+            android:text="가격 정보" />
+    </LinearLayout>
+</ScrollView>
