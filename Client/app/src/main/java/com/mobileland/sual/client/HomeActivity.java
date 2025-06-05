@@ -92,8 +92,9 @@ public class HomeActivity extends AppCompatActivity {
                 selectedFragment = new ScheduleFragment();
             } else if (itemId == R.id.menu_save) {
                 selectedFragment = new SaveFragment();
-            } else if (itemId == R.id.menu_my) {
-                selectedFragment = new MyFragment();
+            } else if (itemId == R.id.menu_setting) {
+                Intent intent = new Intent(this, SettingsActivity.class);
+                startActivity(intent);
             }
 
             if (selectedFragment != null) {

@@ -11,17 +11,16 @@ public class SettingsActivity extends AppCompatActivity {
 
     protected void onCreate(Bundle savedInstanceState) {
 
-        // onCreate 내부에 아래 코드 추가
-        Button btnGoHome = findViewById(R.id.btnGoHome);
-        btnGoHome.setOnClickListener(view -> {
-            Intent intent = new Intent(this, HomeActivity.class);
-            startActivity(intent);
-            finish(); // 설정화면 종료하고 홈으로 이동
-        });
-
         ThemeUtils.applyTheme(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
+
+        Button btnGoHome = findViewById(R.id.btnGoHome);
+        btnGoHome.setOnClickListener(v -> {
+            Intent intent = new Intent(this, HomeActivity.class);
+            startActivity(intent);
+            finish(); // 설정화면 종료
+        });
 
         Switch darkModeSwitch = findViewById(R.id.darkModeSwitch);
         darkModeSwitch.setChecked(ThemeUtils.isDark(this));

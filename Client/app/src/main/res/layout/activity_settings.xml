@@ -3,9 +3,9 @@
     android:padding="24dp"
     android:gravity="center"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="?android:windowBackground">
 
-    <!-- 🔙 홈으로 가는 버튼 -->
     <Button
         android:id="@+id/btnGoHome"
         android:layout_width="wrap_content"

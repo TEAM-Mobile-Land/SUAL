@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:tabIndicatorColor="@color/primary500"
-        app:tabSelectedTextColor="@color/primary700"
+        app:tabSelectedTextColor="?attr/android:textColor"
         app:tabTextColor="@color/primary900" />
 
     <!-- 닫기 버튼 추가 (홈으로 이동하기) -->

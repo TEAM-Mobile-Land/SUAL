@@ -225,7 +225,7 @@ public class HomeFragment extends Fragment {
 
         CalendarView calendarView = view.findViewById(R.id.calendarView);
         ChipGroup chipGroup = view.findViewById(R.id.scheduleChipGroup);
-        TextView todayDateText = view.findViewById(R.id.todayDateText); // ✅ todayDateText 바인딩
+        TextView todayDateText = view.findViewById(R.id.todayDateText);
 
         Map<String, List<String>> scheduleMap = readScheduleData(getContext());
 
@@ -289,7 +289,7 @@ public class HomeFragment extends Fragment {
             if (root.has(today)) {
                 JSONObject todayMeals = root.getJSONObject(today);
 
-                String mealType = getCurrentMealType();  // ⬅️ 여기서 결정
+                String mealType = getCurrentMealType();
                 if (todayMeals.has(mealType)) {
                     JSONArray menuArray = todayMeals.getJSONObject(mealType).getJSONArray("menu");
 
